@@ -1,37 +1,32 @@
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   images: {
-    domains: ['localhost', 'firebasestorage.googleapis.com'],
+    domains: [
+      'localhost',
+      'firebasestorage.googleapis.com',
+      'lh3.googleusercontent.com',
+    ],
     formats: ['image/avif', 'image/webp'],
   },
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
-  // Enable PWA capabilities
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
         ],
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig);
