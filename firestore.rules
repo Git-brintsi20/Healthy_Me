@@ -1,0 +1,236 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Helper Functions ---
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user is the document owner
+    function isOwner(resource) {
+      return request.auth.uid == resource.data.userId;
+    }
+    
+    // Check if user has admin role
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+    }
+    
+    // Check if user has super admin role
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin';
+    }
+    
+    // Validate required fields for user document
+    function isValidUserData(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'preferences']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.displayName is string &&
+             data.role in ['user', 'admin', 'super_admin'];
+    }
+    
+    // Validate nutrition fact document
+    function isValidNutritionData(data) {
+      return data.keys().hasAll(['foodName', 'calories', 'macros', 'source']) &&
+             data.foodName is string &&
+             data.calories is number &&
+             data.macros is map &&
+             data.source is string;
+    }
+    
+    // Validate myth document
+    function isValidMythData(data) {
+      return data.keys().hasAll(['title', 'myth', 'fact', 'explanation', 'category']) &&
+             data.title is string &&
+             data.myth is string &&
+             data.fact is string &&
+             data.explanation is string &&
+             data.category is string;
+    }
+    
+    // Check if document is being created (not updated)
+    function isCreating() {
+      return resource == null;
+    }
+    
+    // Check if only allowed fields are being updated
+    function isAllowedUpdate(allowedFields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
+    }
+    
+    // --- User Collection Rules ---
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Users can create their own profile with valid data
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       isValidUserData(request.resource.data) &&
+                       request.resource.data.uid == request.auth.uid;
+      
+      // Users can update their own profile (excluding role)
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       isAllowedUpdate(['displayName', 'photoURL', 'preferences', 'updatedAt']);
+      
+      // Only super admins can delete users
+      allow delete: if isSuperAdmin();
+      
+      // Admins can read all users
+      allow read: if isAdmin();
+      
+      // Super admins can update user roles
+      allow update: if isSuperAdmin() && 
+                       isAllowedUpdate(['role', 'updatedAt']);
+    }
+    
+    // --- Nutrition Facts Collection Rules ---
+    match /nutrition_facts/{factId} {
+      // Anyone can read verified nutrition facts
+      allow read: if resource.data.verified == true;
+      
+      // Authenticated users can read all nutrition facts
+      allow read: if isAuthenticated();
+      
+      // Authenticated users can create nutrition facts
+      allow create: if isAuthenticated() && 
+                       isValidNutritionData(request.resource.data);
+      
+      // Admins can update and delete nutrition facts
+      allow update, delete: if isAdmin();
+      
+      // Users can update their own submissions before verification
+      allow update: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid &&
+                       resource.data.verified == false;
+    }
+    
+    // --- Myths Collection Rules ---
+    match /myths/{mythId} {
+      // Anyone can read verified myths
+      allow read: if resource.data.verified == true;
+      
+      // Authenticated users can read all myths
+      allow read: if isAuthenticated();
+      
+      // Authenticated users can create myths
+      allow create: if isAuthenticated() && 
+                       isValidMythData(request.resource.data);
+      
+      // Admins can update and delete myths
+      allow update, delete: if isAdmin();
+      
+      // Users can update their own submissions before verification
+      allow update: if isAuthenticated() && 
+                       resource.data.createdBy == request.auth.uid &&
+                       resource.data.verified == false;
+    }
+    
+    // --- Search History Collection Rules ---
+    match /searches/{searchId} {
+      // Users can read their own searches
+      allow read: if isAuthenticated() && isOwner(resource);
+      
+      // Users can create their own searches
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own searches
+      allow update: if isAuthenticated() && isOwner(resource);
+      
+      // Users can delete their own searches
+      allow delete: if isAuthenticated() && isOwner(resource);
+      
+      // Admins can read all searches (for analytics)
+      allow read: if isAdmin();
+    }
+    
+    // --- Favorites Collection Rules ---
+    match /favorites/{favoriteId} {
+      // Users can read their own favorites
+      allow read: if isAuthenticated() && isOwner(resource);
+      
+      // Users can create their own favorites
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own favorites
+      allow update: if isAuthenticated() && isOwner(resource);
+      
+      // Users can delete their own favorites
+      allow delete: if isAuthenticated() && isOwner(resource);
+    }
+    
+    // --- History Collection Rules ---
+    match /history/{historyId} {
+      // Users can read their own history
+      allow read: if isAuthenticated() && isOwner(resource);
+      
+      // Users can create their own history entries
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own history
+      allow update: if isAuthenticated() && isOwner(resource);
+      
+      // Users can delete their own history
+      allow delete: if isAuthenticated() && isOwner(resource);
+      
+      // Admins can read all history (for analytics)
+      allow read: if isAdmin();
+    }
+    
+    // --- Admin Analytics Collection Rules ---
+    match /analytics/{document=**} {
+      // Only admins can read analytics data
+      allow read: if isAdmin();
+      
+      // Only super admins can write analytics data
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- System Configuration Rules ---
+    match /config/{document=**} {
+      // Anyone can read public config
+      allow read: if true;
+      
+      // Only super admins can update config
+      allow write: if isSuperAdmin();
+    }
+    
+    // --- Feedback and Reports Collection Rules ---
+    match /feedback/{feedbackId} {
+      // Users can create feedback
+      allow create: if isAuthenticated();
+      
+      // Users can read their own feedback
+      allow read: if isAuthenticated() && isOwner(resource);
+      
+      // Admins can read all feedback
+      allow read: if isAdmin();
+      
+      // Admins can update feedback status
+      allow update: if isAdmin() && 
+                       isAllowedUpdate(['status', 'adminNotes', 'updatedAt']);
+    }
+    
+    // --- Content Moderation Rules ---
+    match /moderation/{document=**} {
+      // Only admins can access moderation data
+      allow read, write: if isAdmin();
+    }
+    
+    // --- Default deny rule for any other collections ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

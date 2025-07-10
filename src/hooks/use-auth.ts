@@ -1,4 +1,7 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -8,9 +11,11 @@ import {
   updateProfile,
   User
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, getUserRole, USER_ROLES } from '@/lib/firebase';
 
 interface AuthState {
+  user: User | null;
+  role: string | null;
   loading: boolean;
   error: string | null;
 }
@@ -27,115 +32,111 @@ interface RegisterData {
 }
 
 export function useAuth() {
+  const [user, loading, firebaseError] = useAuthState(auth);
   const [authState, setAuthState] = useState<AuthState>({
-    loading: false,
+    user: null,
+    role: null,
+    loading: true,
     error: null,
   });
 
-  const setLoading = (loading: boolean) => {
-    setAuthState(prev => ({ ...prev, loading }));
-  };
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (user) {
+        try {
+          const idTokenResult = await user.getIdTokenResult();
+          const role = idTokenResult.claims.role || getUserRole(user.email || '');
+          setAuthState((prev) => ({ ...prev, user, role, loading: false }));
+        } catch (error) {
+          setAuthState((prev) => ({ ...prev, user, role: null, loading: false }));
+        }
+      } else {
+        setAuthState((prev) => ({ ...prev, user: null, role: null, loading: false }));
+      }
+    };
+    fetchRole();
+  }, [user, loading]);
 
   const setError = (error: string | null) => {
-    setAuthState(prev => ({ ...prev, error }));
+    setAuthState((prev) => ({ ...prev, error }));
   };
 
-  // Login with email and password
   const loginWithEmail = async ({ email, password }: LoginData): Promise<User> => {
     try {
-      setLoading(true);
-      setError(null);
-      
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }));
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
-    } catch (error: any) {
-      const errorMessage = getAuthErrorMessage(error.code);
-      setError(errorMessage);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Register with email and password
-  const registerWithEmail = async ({ email, password, displayName }: RegisterData): Promise<User> => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      
-      // Update user profile with display name
-      await updateProfile(user, { displayName });
-      
+      const idTokenResult = await user.getIdTokenResult();
+      const role = idTokenResult.claims.role || getUserRole(email);
+      setAuthState((prev) => ({ ...prev, user, role, loading: false }));
       return user;
     } catch (error: any) {
       const errorMessage = getAuthErrorMessage(error.code);
       setError(errorMessage);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Login with Google
+  const registerWithEmail = async ({ email, password, displayName }: RegisterData): Promise<User> => {
+    try {
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }));
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await updateProfile(user, { displayName });
+      const role = email === process.env.ADMIN_EMAIL ? USER_ROLES.ADMIN : getUserRole(email);
+      setAuthState((prev) => ({ ...prev, user, role, loading: false }));
+      return user;
+    } catch (error: any) {
+      const errorMessage = getAuthErrorMessage(error.code);
+      setError(errorMessage);
+      throw error;
+    }
+  };
+
   const loginWithGoogle = async (): Promise<User> => {
     try {
-      setLoading(true);
-      setError(null);
-      
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }));
       const provider = new GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
-      
+      provider.addScope('email profile');
       const userCredential = await signInWithPopup(auth, provider);
-      return userCredential.user;
+      const user = userCredential.user;
+      const idTokenResult = await user.getIdTokenResult();
+      const role = idTokenResult.claims.role || getUserRole(user.email || '');
+      setAuthState((prev) => ({ ...prev, user, role, loading: false }));
+      return user;
     } catch (error: any) {
       const errorMessage = getAuthErrorMessage(error.code);
       setError(errorMessage);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Reset password
   const resetPassword = async (email: string): Promise<void> => {
     try {
-      setLoading(true);
-      setError(null);
-      
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }));
       await sendPasswordResetEmail(auth, email);
+      setAuthState((prev) => ({ ...prev, loading: false }));
     } catch (error: any) {
       const errorMessage = getAuthErrorMessage(error.code);
       setError(errorMessage);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Update user profile
   const updateUserProfile = async (data: { displayName?: string; photoURL?: string }): Promise<void> => {
     try {
-      setLoading(true);
-      setError(null);
-      
+      setAuthState((prev) => ({ ...prev, loading: true, error: null }));
       const user = auth.currentUser;
       if (!user) throw new Error('No user is currently signed in');
-      
       await updateProfile(user, data);
+      setAuthState((prev) => ({ ...prev, loading: false }));
     } catch (error: any) {
       const errorMessage = getAuthErrorMessage(error.code);
       setError(errorMessage);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Clear error
   const clearError = () => {
     setError(null);
   };
@@ -151,7 +152,6 @@ export function useAuth() {
   };
 }
 
-// Helper function to get user-friendly error messages
 function getAuthErrorMessage(errorCode: string): string {
   switch (errorCode) {
     case 'auth/user-not-found':
@@ -182,5 +182,3 @@ function getAuthErrorMessage(errorCode: string): string {
       return 'An error occurred during authentication. Please try again.';
   }
 }
-
-export default useAuth;

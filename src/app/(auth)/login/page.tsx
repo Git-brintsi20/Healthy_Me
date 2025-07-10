@@ -14,7 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginWithEmail, loginWithGoogle, loading, error, clearError } = useAuth();
+  const { loginWithEmail, loginWithGoogle, loading, error, clearError, role } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -44,14 +44,12 @@ export default function LoginPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Clear validation error when user starts typing
     if (validationErrors[name]) {
-      setValidationErrors(prev => ({ ...prev, [name]: '' }));
+      setValidationErrors((prev) => ({ ...prev, [name]: '' }));
     }
     
-    // Clear auth error when user starts typing
     if (error) {
       clearError();
     }
@@ -64,7 +62,8 @@ export default function LoginPage() {
     
     try {
       await loginWithEmail(formData);
-      router.push('/dashboard');
+      const redirectPath = ['admin', 'super_admin'].includes(role || '') ? '/admin' : '/dashboard';
+      router.push(redirectPath);
     } catch (error) {
       console.error('Login error:', error);
     }
@@ -73,7 +72,8 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
-      router.push('/dashboard');
+      const redirectPath = ['admin', 'super_admin'].includes(role || '') ? '/admin' : '/dashboard';
+      router.push(redirectPath);
     } catch (error) {
       console.error('Google login error:', error);
     }
@@ -95,7 +95,6 @@ export default function LoginPage() {
         </CardHeader>
         
         <CardContent className="space-y-4">
-          {/* Google Login Button */}
           <Button
             variant="outline"
             className="w-full"
@@ -117,14 +116,12 @@ export default function LoginPage() {
             </div>
           </div>
           
-          {/* Auth Error Display */}
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           
-          {/* Email Login Form */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

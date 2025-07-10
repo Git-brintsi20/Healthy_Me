@@ -1,14 +1,17 @@
-// app/api/analyze-nutrition/route.ts - Nutrition Analysis API
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeNutrition } from '@/lib/gemini';
-import { auth } from '@/lib/firebase';
+import { getAuth } from 'firebase-admin/auth';
+import { initializeApp, getApps } from 'firebase-admin/app';
 import { headers } from 'next/headers';
+
+// Initialize Firebase Admin SDK if not already initialized
+if (!getApps().length) {
+  initializeApp();
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the authorization header
+    // Verify Firebase token
     const authHeader = headers().get('authorization');
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Unauthorized - Missing or invalid token' },
@@ -16,12 +19,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extract the token (in a real app, you'd verify this token)
     const token = authHeader.split(' ')[1];
-    
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const userId = decodedToken.uid;
+
     // Parse request body
     const body = await request.json();
-    const { foodItem, userId } = body;
+    const { foodItem } = body;
 
     if (!foodItem || typeof foodItem !== 'string') {
       return NextResponse.json(
@@ -30,35 +34,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!userId || typeof userId !== 'string') {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Analyze nutrition using Gemini API
+    // Call Edamam API via RapidAPI
     const nutritionData = await analyzeNutrition(foodItem);
 
-    // Optional: Save to Firestore (you can implement this based on your needs)
-    // await saveNutritionSearch(userId, foodItem, nutritionData);
+    // Save to Firestore (optional)
+    await saveNutritionSearch(userId, foodItem, nutritionData);
 
     return NextResponse.json({
       success: true,
       data: nutritionData,
       timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Error in nutrition analysis API:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -68,10 +56,22 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Verify Firebase token
+    const authHeader = headers().get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Missing or invalid token' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decodedToken = await getAuth().verifyIdToken(token);
+    const userId = decodedToken.uid;
+
     // Get query parameters
     const { searchParams } = new URL(request.url);
     const foodItem = searchParams.get('food');
-    const userId = searchParams.get('userId');
 
     if (!foodItem) {
       return NextResponse.json(
@@ -80,32 +80,19 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID query parameter is required' },
-        { status: 400 }
-      );
-    }
-
-    // Analyze nutrition using Gemini API
+    // Call Edamam API via RapidAPI
     const nutritionData = await analyzeNutrition(foodItem);
+
+    // Save to Firestore (optional)
+    await saveNutritionSearch(userId, foodItem, nutritionData);
 
     return NextResponse.json({
       success: true,
       data: nutritionData,
       timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Error in nutrition analysis API:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -113,26 +100,64 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Helper function to save nutrition search (implement based on your needs)
-async function saveNutritionSearch(
-  userId: string, 
-  foodItem: string, 
-  nutritionData: any
-): Promise<void> {
-  // This is where you would save the search to Firestore
-  // Implementation depends on your specific requirements
+async function analyzeNutrition(foodItem: string): Promise<any> {
   try {
-    // Example implementation:
-    // const searchDoc = {
+    const response = await fetch('https://nutrition-analysis.p.rapidapi.com/nutrition-details', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Key': process.env.NUTRITION_API_KEY || '',
+        'X-RapidAPI-Host': 'nutrition-analysis.p.rapidapi.com',
+      },
+      body: JSON.stringify({
+        ingr: [foodItem],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Edamam API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      calories: data.totalNutrients.ENERC_KCAL?.quantity || 0,
+      macros: {
+        protein: data.totalNutrients.PROCNT?.quantity || 0,
+        carbs: data.totalNutrients.CHOCDF?.quantity || 0,
+        fat: data.totalNutrients.FAT?.quantity || 0,
+        fiber: data.totalNutrients.FIBTG?.quantity || 0,
+      },
+      micronutrients: {
+        vitamins: {
+          vitaminA: data.totalNutrients.VITA_RAE?.quantity || 0,
+          vitaminC: data.totalNutrients.VITC?.quantity || 0,
+        },
+        minerals: {
+          calcium: data.totalNutrients.CA?.quantity || 0,
+          iron: data.totalNutrients.FE?.quantity || 0,
+        },
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching Edamam data:', error);
+    throw new Error('Failed to analyze nutrition');
+  }
+}
+
+async function saveNutritionSearch(userId: string, foodItem: string, nutritionData: any): Promise<void> {
+  try {
+    // Implement Firestore save if needed
+    // Example:
+    // import { getFirestore, collection, addDoc } from 'firebase/firestore';
+    // const db = getFirestore();
+    // await addDoc(collection(db, 'searches'), {
     //   userId,
     //   query: foodItem,
     //   results: nutritionData,
     //   timestamp: new Date(),
-    //   type: 'nutrition'
-    // };
-    // await addDoc(collection(db, COLLECTIONS.SEARCHES), searchDoc);
+    //   type: 'nutrition',
+    // });
   } catch (error) {
     console.error('Error saving nutrition search:', error);
-    // Don't throw here as it's not critical for the API response
   }
 }

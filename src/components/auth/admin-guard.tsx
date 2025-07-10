@@ -1,53 +1,53 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shield, AlertTriangle } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { getAuth } from 'firebase/auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Shield, AlertTriangle } from 'lucide-react';
 
 interface AdminGuardProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function AdminGuard({ children }: AdminGuardProps) {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [checking, setChecking] = useState(true)
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      if (loading) return
+      if (loading) return;
 
       if (!user) {
-        router.push('/login')
-        return
+        router.push('/login');
+        return;
       }
 
       try {
-        // Check user role in Firestore
-        const userDoc = await getDoc(doc(db, 'users', user.uid))
-        const userData = userDoc.data()
+        // Get ID token result to check custom claims
+        const auth = getAuth();
+        const idTokenResult = await auth.currentUser?.getIdTokenResult();
+        const role = idTokenResult?.claims.role;
 
-        if (!userData || !['admin', 'super_admin'].includes(userData.role)) {
-          router.push('/dashboard')
-          return
+        if (!role || !['admin', 'super_admin'].includes(role)) {
+          router.push('/dashboard');
+          return;
         }
 
-        setIsAdmin(true)
+        setIsAdmin(true);
       } catch (error) {
-        console.error('Error checking admin status:', error)
-        router.push('/dashboard')
+        console.error('Error checking admin status:', error);
+        router.push('/dashboard');
       } finally {
-        setChecking(false)
+        setChecking(false);
       }
-    }
+    };
 
-    checkAdminStatus()
-  }, [user, loading, router])
+    checkAdminStatus();
+  }, [user, loading, router]);
 
   if (loading || checking) {
     return (
@@ -56,16 +56,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
           <CardHeader className="text-center">
             <Shield className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
             <CardTitle>Verifying Access</CardTitle>
-            <CardDescription>
-              Checking administrative privileges...
-            </CardDescription>
+            <CardDescription>Checking administrative privileges...</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (!isAdmin) {
@@ -75,9 +73,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
           <CardHeader className="text-center">
             <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-destructive" />
             <CardTitle>Access Denied</CardTitle>
-            <CardDescription>
-              You don't have permission to access this area.
-            </CardDescription>
+            <CardDescription>You don&apos;t have permission to access this area.</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground mb-4">
@@ -92,8 +88,8 @@ export function AdminGuard({ children }: AdminGuardProps) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }
