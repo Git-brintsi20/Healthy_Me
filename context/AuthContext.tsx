@@ -74,9 +74,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    
     try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
+      const result = await signInWithPopup(auth, provider);
+      // Wait a moment for session creation
+      if (result.user) {
+        const idToken = await result.user.getIdToken();
+        await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+        });
+      }
+    } catch (error: any) {
+      // Don't throw error if user just closed the popup
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.log("Login popup closed by user");
+        return;
+      }
       console.error("Error signing in with Google:", error);
       throw error;
     }
@@ -84,7 +102,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithEmail = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      // Wait for session creation
+      if (result.user) {
+        const idToken = await result.user.getIdToken();
+        await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+        });
+      }
     } catch (error) {
       console.error("Error signing in with email:", error);
       throw error;

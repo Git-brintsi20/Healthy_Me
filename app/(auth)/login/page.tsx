@@ -50,11 +50,17 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await loginWithGoogle()
-      toast.success("Successfully logged in with Google!")
-      router.push("/dashboard")
+      // Only show success if login actually completed
+      if (user) {
+        toast.success("Successfully logged in with Google!")
+        router.push("/dashboard")
+      }
     } catch (error: any) {
-      console.error("Google login error:", error)
-      toast.error(error.message || "Failed to login with Google")
+      // Don't show error if user just closed the popup
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        console.error("Google login error:", error)
+        toast.error(error.message || "Failed to login with Google")
+      }
     } finally {
       setLoading(false)
     }
