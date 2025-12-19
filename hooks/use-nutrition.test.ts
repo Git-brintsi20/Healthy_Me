@@ -37,7 +37,8 @@ describe('useNutrition', () => {
   })
 
   it('should handle errors', async () => {
-    ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('API Error'))
+    const mockError = new Error('API Error')
+    ;(global.fetch as jest.Mock).mockRejectedValueOnce(mockError)
 
     const { result } = renderHook(() => useNutrition())
 
