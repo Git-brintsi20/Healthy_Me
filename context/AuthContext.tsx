@@ -48,8 +48,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Subscribe to auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      
+      // Create session cookie when user logs in
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          await fetch("/api/auth/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken }),
+          });
+        } catch (error) {
+          console.error("Error creating session:", error);
+        }
+      }
+      
       setLoading(false);
     });
 
@@ -92,6 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      // Delete session cookie
+      await fetch("/api/auth/session", { method: "DELETE" });
+      // Sign out from Firebase
       await signOut(auth);
     } catch (error) {
       console.error("Error signing out:", error);
