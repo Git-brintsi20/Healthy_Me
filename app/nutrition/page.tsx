@@ -46,8 +46,7 @@ export default function NutritionPage() {
         await addToFavorites({ name: data.name, calories: data.calories })
         toast.success("Added to favorites!")
       } catch (error) {
-        toast.error("Failed to add to favorites
-        toast.error("Failed to analyze food. Please try again.")
+        toast.error("Failed to add to favorites")
       }
     }
   }

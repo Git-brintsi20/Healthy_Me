@@ -21,8 +21,8 @@ interface MythResponse extends MythData {
 
 export default function MythsPage() {
   const [question, setQuestion] = React.useState("")
-  const [responses, setResponses] = React.us
-  const { incrementMythsDebunked } = useUserData()eState<MythResponse[]>([])
+  const [responses, setResponses] = React.useState<MythResponse[]>([])
+  const { incrementMythsDebunked } = useUserData()
   const { verifyMyth, loading } = useMyths()
 
   const handleSubmit = async (e: React.FormEvent) => {
