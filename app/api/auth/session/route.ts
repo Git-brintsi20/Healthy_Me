@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Set the cookie
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.set("authToken", sessionCookie, {
-      maxAge: expiresIn,
+      maxAge: expiresIn / 1000, // Convert to seconds
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.delete("authToken");
 
     return NextResponse.json({ success: true });
