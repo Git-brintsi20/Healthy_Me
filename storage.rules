@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // User uploads folder - users can only access their own files
+    match /users/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAuthenticated() && 
+                     request.auth.uid == userId &&
+                     request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+                     request.resource.contentType.matches('image/.*'); // Only images
+    }
+    
+    // Food images - authenticated users can read, only app can write
+    match /food_images/{imageId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only backend can write
+    }
+    
+    // Public assets - anyone can read
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

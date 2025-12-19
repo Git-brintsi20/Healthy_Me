@@ -15,6 +15,7 @@ import {
   Sparkles,
   LogOut,
   User,
+  Heart,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,6 +32,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Nutrition", href: "/nutrition", icon: Apple },
   { name: "Myths", href: "/myths", icon: ShieldQuestion },
+  { name: "Favorites", href: "/favorites", icon: Heart },
   { name: "History", href: "/history", icon: History },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
