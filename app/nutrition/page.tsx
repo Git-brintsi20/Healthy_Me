@@ -10,12 +10,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useNutrition } from "@/hooks/use-nutrition"
 import { useImageUpload } from "@/hooks/use-image-upload"
+import { useUserData } from "@/hooks/use-user-data"
 import { toast } from "sonner"
 
 export default function NutritionPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
   const { analyzeFood, loading, data } = useNutrition()
   const { analyzeImage, loading: imageLoading } = useImageUpload()
+  const { addSearchHistory, addToFavorites } = useUserData()
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   const macroData = data
@@ -30,9 +32,21 @@ export default function NutritionPage() {
     e.preventDefault()
     if (searchQuery.trim()) {
       try {
-        await analyzeFood(searchQuery)
+        await addSearchHistory(searchQuery)
         toast.success("Food analyzed successfully!")
       } catch (error) {
+        toast.error("Failed to analyze food. Please try again.")
+      }
+    }
+  }
+
+  const handleAddToFavorites = async () => {
+    if (data) {
+      try {
+        await addToFavorites({ name: data.name, calories: data.calories })
+        toast.success("Added to favorites!")
+      } catch (error) {
+        toast.error("Failed to add to favorites
         toast.error("Failed to analyze food. Please try again.")
       }
     }

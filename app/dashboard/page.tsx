@@ -1,10 +1,21 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { Apple, ShieldQuestion, HistoryIcon, TrendingUp, Zap, Target } from "lucide-react"
+import { Apple, ShieldQuestion, HistoryIcon, TrendingUp, Zap, Target, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/hooks/use-auth"
+import { useUserData } from "@/hooks/use-user-data"
 
 export default function DashboardPage() {
+  const { user } = useAuth()
+  const { userData, loading } = useUserData()
+
+  const totalSearches = userData?.totalSearches || 0
+  const mythsDebunked = userData?.mythsDebunked || 0
+  const dailyGoal = userData?.dailyGoal || { calories: 2000, current: 0 }
+  const goalPercentage = Math.round((dailyGoal.current / dailyGoal.calories) * 100)
   return (
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar />
@@ -15,50 +26,60 @@ export default function DashboardPage() {
         <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
           <div className="px-6 py-6">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back! Here's your nutrition overview.</p>
+            <p className="text-muted-foreground mt-1">
+              {user ? `Welcome back, ${user.displayName || user.email}!` : "Welcome! Here's your nutrition overview."}
+            </p>
           </div>
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Stats Grid */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Searches</CardTitle>
-                <Zap className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">127</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-600">+12%</span> from last month
-                </p>
-              </CardContent>
-            </Card>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <>
+              {/* Stats Grid */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Card className="border-border/50">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Searches</CardTitle>
+                    <Zap className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">{totalSearches}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      All-time nutrition searches
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Myths Debunked</CardTitle>
-                <ShieldQuestion className="h-4 w-4 text-secondary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">43</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-600">+8</span> this week
-                </p>
-              </CardContent>
-            </Card>
+                <Card className="border-border/50">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Myths Debunked</CardTitle>
+                    <ShieldQuestion className="h-4 w-4 text-secondary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">{mythsDebunked}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Questions verified
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Daily Goal</CardTitle>
-                <Target className="h-4 w-4 text-accent" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">85%</div>
-                <p className="text-xs text-muted-foreground mt-1">1,700 / 2,000 calories</p>
-              </CardContent>
-            </Card>
-          </div>
+                <Card className="border-border/50">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Daily Goal</CardTitle>
+                    <Target className="h-4 w-4 text-accent" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-foreground">{goalPercentage}%</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {dailyGoal.current} / {dailyGoal.calories} calories
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
           {/* Quick Actions */}
           <Card className="border-border/50">
@@ -119,51 +140,61 @@ export default function DashboardPage() {
                 <CardDescription>Your latest nutrition analyses</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {[
-                  { name: "Grilled Chicken Breast", calories: 165, time: "2 hours ago" },
-                  { name: "Brown Rice", calories: 216, time: "5 hours ago" },
-                  { name: "Greek Yogurt", calories: 100, time: "Yesterday" },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between border-b border-border/40 pb-3 last:border-0"
-                  >
-                    <div>
-                      <div className="font-medium text-foreground">{item.name}</div>
-                      <div className="text-sm text-muted-foreground">{item.time}</div>
+                {userData && userData.searchHistory.length > 0 ? (
+                  userData.searchHistory.slice(0, 5).map((item, i) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border-b border-border/40 pb-3 last:border-0"
+                    >
+                      <div>
+                        <div className="font-medium text-foreground">{item.foodName}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(item.searchedAt).toLocaleDateString()}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-primary">{item.calories} cal</div>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No recent searches. Start analyzing food to see your history here!
+                  </p>
+                )}
               </CardContent>
             </Card>
 
             <Card className="border-border/50">
               <CardHeader>
-                <CardTitle>Nutrition Insights</CardTitle>
-                <CardDescription>AI-powered recommendations</CardDescription>
+                <CardTitle>Favorite Foods</CardTitle>
+                <CardDescription>Your saved nutrition items</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-                  <div className="flex items-start gap-3">
-                    <TrendingUp className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-foreground">Protein Intake</div>
-                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                        You're 15g below your protein goal. Consider adding lean proteins to your next meal.
-                      </p>
+                {userData && userData.favorites.length > 0 ? (
+                  userData.favorites.slice(0, 5).map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between border-b border-border/40 pb-3 last:border-0"
+                    >
+                      <div>
+                        <div className="font-medium text-foreground">{item.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Added {new Date(item.addedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold text-primary">{item.calories} cal</div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-4">
-                  <div className="flex items-start gap-3">
-                    <Target className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium text-foreground">Hydration Reminder</div>
-                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                        Remember to drink water throughout the day. Aim for 8 glasses.
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No favorites yet. Add foods from your search results!
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+            </>
+          )}
                       </p>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { Send, Sparkles, CheckCircle2, XCircle, Clock, ExternalLink } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMyths } from "@/hooks/use-myths"
+import { useUserData } from "@/hooks/use-user-data"
 import { toast } from "sonner"
 import { MythData } from "@/types"
 
@@ -20,7 +21,8 @@ interface MythResponse extends MythData {
 
 export default function MythsPage() {
   const [question, setQuestion] = React.useState("")
-  const [responses, setResponses] = React.useState<MythResponse[]>([])
+  const [responses, setResponses] = React.us
+  const { incrementMythsDebunked } = useUserData()eState<MythResponse[]>([])
   const { verifyMyth, loading } = useMyths()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,6 +36,7 @@ export default function MythsPage() {
         question: question,
       }
       setResponses([newResponse, ...responses])
+      await incrementMythsDebunked()
       setQuestion("")
       toast.success("Myth verified successfully!")
     } catch (error) {
