@@ -5,40 +5,62 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { Search, Camera, Flame, Beef, Wheat, Droplet } from "lucide-react"
+import { Search, Camera, Flame, Beef, Wheat, Droplet, Loader2 } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useNutrition } from "@/hooks/use-nutrition"
+import { useImageUpload } from "@/hooks/use-image-upload"
+import { toast } from "sonner"
 
 export default function NutritionPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [showResults, setShowResults] = React.useState(false)
+  const { analyzeFood, loading, data } = useNutrition()
+  const { analyzeImage, loading: imageLoading } = useImageUpload()
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  // Sample data - in real app, this would come from AI analysis
-  const macroData = [
-    { name: "Protein", value: 31, color: "#640000" },
-    { name: "Carbs", value: 0, color: "#B67E7D" },
-    { name: "Fats", value: 3.6, color: "#420001" },
-  ]
+  const macroData = data
+    ? [
+        { name: "Protein", value: data.macros.protein, color: "#640000" },
+        { name: "Carbs", value: data.macros.carbs, color: "#B67E7D" },
+        { name: "Fats", value: data.macros.fats, color: "#420001" },
+      ]
+    : []
 
-  const vitamins = [
-    { name: "Vitamin A", amount: "2%", daily: "16 IU" },
-    { name: "Vitamin C", amount: "0%", daily: "0 mg" },
-    { name: "Vitamin D", amount: "1%", daily: "6 IU" },
-    { name: "Calcium", amount: "1%", daily: "15 mg" },
-    { name: "Iron", amount: "5%", daily: "0.9 mg" },
-    { name: "Potassium", amount: "7%", daily: "256 mg" },
-  ]
-
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      setShowResults(true)
+      try {
+        await analyzeFood(searchQuery)
+        toast.success("Food analyzed successfully!")
+      } catch (error) {
+        toast.error("Failed to analyze food. Please try again.")
+      }
     }
   }
 
   const handleImageUpload = () => {
-    // Image upload handler
-    setShowResults(true)
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onloadend = async () => {
+      const base64 = reader.result as string
+      try {
+        const result = await analyzeImage(base64)
+        if (result.detectedFoods && result.detectedFoods.length > 0) {
+          // Analyze the first detected food
+          await analyzeFood(result.detectedFoods[0])
+          toast.success(`Detected: ${result.detectedFoods.join(", ")}`)
+        }
+      } catch (error) {
+        toast.error("Failed to analyze image. Please try again.")
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   return (
@@ -67,11 +89,12 @@ export default function NutritionPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
+                    disabled={loading || imageLoading}
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial">
-                    <Search className="mr-2 h-4 w-4" />
+                  <Button type="submit" className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial" disabled={loading || imageLoading}>
+                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
                     Analyze
                   </Button>
                   <Button
@@ -79,28 +102,35 @@ export default function NutritionPage() {
                     variant="outline"
                     onClick={handleImageUpload}
                     className="flex-1 sm:flex-initial bg-transparent"
+                    disabled={loading || imageLoading}
                   >
-                    <Camera className="mr-2 h-4 w-4" />
+                    {imageLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
                     Scan Image
                   </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </div>
               </form>
             </CardContent>
           </Card>
 
           {/* Results */}
-          {showResults && (
+          {data && (
             <>
               {/* Calorie Card */}
               <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
                 <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-5xl font-bold text-primary">165</CardTitle>
-                  <CardDescription className="text-base">Calories per 100g serving</CardDescription>
+                  <CardTitle className="text-5xl font-bold text-primary">{data.calories}</CardTitle>
+                  <CardDescription className="text-base">Calories per {data.servingSize} serving</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground">Grilled Chicken Breast</p>
-                    <p className="mt-1">High in protein, low in fat - excellent for muscle building</p>
+                    <p className="font-medium text-foreground">{data.name}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -157,8 +187,8 @@ export default function NutritionPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">31g</div>
-                        <div className="text-xs text-muted-foreground">62% DV</div>
+                        <div className="text-2xl font-bold text-primary">{data.macros.protein}g</div>
+                        <div className="text-xs text-muted-foreground">{Math.round((data.macros.protein / 50) * 100)}% DV</div>
                       </div>
                     </div>
 
@@ -173,8 +203,8 @@ export default function NutritionPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-secondary">0g</div>
-                        <div className="text-xs text-muted-foreground">0% DV</div>
+                        <div className="text-2xl font-bold text-secondary">{data.macros.carbs}g</div>
+                        <div className="text-xs text-muted-foreground">{Math.round((data.macros.carbs / 300) * 100)}% DV</div>
                       </div>
                     </div>
 
@@ -189,8 +219,8 @@ export default function NutritionPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-accent">3.6g</div>
-                        <div className="text-xs text-muted-foreground">5% DV</div>
+                        <div className="text-2xl font-bold text-accent">{data.macros.fats}g</div>
+                        <div className="text-xs text-muted-foreground">{Math.round((data.macros.fats / 70) * 100)}% DV</div>
                       </div>
                     </div>
                   </CardContent>
@@ -201,7 +231,7 @@ export default function NutritionPage() {
               <Card className="border-border/50">
                 <CardHeader>
                   <CardTitle>Vitamins & Minerals</CardTitle>
-                  <CardDescription>Micronutrient profile per 100g serving</CardDescription>
+                  <CardDescription>Micronutrient profile per {data.servingSize} serving</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
@@ -214,19 +244,36 @@ export default function NutritionPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {vitamins.map((vitamin, i) => (
+                        {data.vitamins.map((vitamin, i) => (
                           <TableRow key={i}>
                             <TableCell className="font-medium">{vitamin.name}</TableCell>
-                            <TableCell className="text-right">{vitamin.daily}</TableCell>
+                            <TableCell className="text-right">{vitamin.amount}</TableCell>
                             <TableCell className="text-right">
                               <span
                                 className={
-                                  Number.parseInt(vitamin.amount) > 10
+                                  vitamin.dailyValue > 10
                                     ? "text-green-600 font-semibold"
                                     : "text-muted-foreground"
                                 }
                               >
-                                {vitamin.amount}
+                                {vitamin.dailyValue}%
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {data.minerals.map((mineral, i) => (
+                          <TableRow key={`mineral-${i}`}>
+                            <TableCell className="font-medium">{mineral.name}</TableCell>
+                            <TableCell className="text-right">{mineral.amount}</TableCell>
+                            <TableCell className="text-right">
+                              <span
+                                className={
+                                  mineral.dailyValue > 10
+                                    ? "text-green-600 font-semibold"
+                                    : "text-muted-foreground"
+                                }
+                              >
+                                {mineral.dailyValue}%
                               </span>
                             </TableCell>
                           </TableRow>
@@ -242,23 +289,16 @@ export default function NutritionPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Flame className="h-5 w-5 text-primary" />
-                    AI Nutrition Insights
+                    Nutrition Summary
                   </CardTitle>
-                  <CardDescription>Personalized recommendations based on this food</CardDescription>
+                  <CardDescription>AI-powered analysis for {data.name}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="rounded-lg border border-border/50 bg-background p-4">
-                    <h4 className="font-semibold text-foreground mb-2">Health Benefits</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Grilled chicken breast is an excellent source of lean protein with minimal fat. It supports muscle
-                      growth, helps with weight management, and provides essential B vitamins for energy metabolism.
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border/50 bg-background p-4">
-                    <h4 className="font-semibold text-foreground mb-2">Serving Suggestion</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Pair with complex carbohydrates like brown rice or sweet potato, and add colorful vegetables for a
-                      well-balanced meal. This combination ensures sustained energy and optimal nutrient absorption.
+                      This food contains {data.calories} calories per {data.servingSize}, with {data.macros.protein}g protein, {data.macros.carbs}g carbs, and {data.macros.fats}g fat.
+                      {data.macros.protein > 20 && " It's an excellent source of protein."}
+                      {data.macros.fiber > 5 && " High in fiber for digestive health."}
                     </p>
                   </div>
                 </CardContent>
@@ -267,7 +307,7 @@ export default function NutritionPage() {
           )}
 
           {/* Empty State */}
-          {!showResults && (
+          {!data && !loading && !imageLoading && (
             <Card className="border-dashed border-2 border-border/50">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">

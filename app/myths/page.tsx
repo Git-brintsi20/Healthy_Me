@@ -8,82 +8,62 @@ import { Badge } from "@/components/ui/badge"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { Send, Sparkles, CheckCircle2, XCircle, Clock, ExternalLink } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useMyths } from "@/hooks/use-myths"
+import { toast } from "sonner"
+import { MythData } from "@/types"
 
-type Verdict = "true" | "false" | "partial" | "pending"
+type Verdict = "TRUE" | "FALSE" | "PARTIALLY_TRUE" | "INCONCLUSIVE"
 
-interface MythResponse {
+interface MythResponse extends MythData {
   question: string
-  verdict: Verdict
-  explanation: string
-  sources: Array<{ title: string; url: string; author?: string }>
 }
 
 export default function MythsPage() {
   const [question, setQuestion] = React.useState("")
   const [responses, setResponses] = React.useState<MythResponse[]>([])
-  const [isLoading, setIsLoading] = React.useState(false)
+  const { verifyMyth, loading } = useMyths()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!question.trim()) return
 
-    setIsLoading(true)
-
-    // Simulate AI response - in real app, this would call the API
-    setTimeout(() => {
+    try {
+      const result = await verifyMyth(question)
       const newResponse: MythResponse = {
+        ...result,
         question: question,
-        verdict: "false",
-        explanation:
-          "This is a common nutrition myth. Eating late at night doesn't inherently cause weight gain. Weight management is primarily determined by total calorie intake versus expenditure throughout the day, not the timing of meals. However, late-night eating may lead to consuming more calories overall if it results in exceeding your daily caloric needs. Studies show that your metabolism doesn't significantly slow down at night, and your body processes calories the same way regardless of the time.",
-        sources: [
-          {
-            title: "Time of Day and Meal Patterns in Obesity",
-            url: "https://pubmed.example.com/12345",
-            author: "Journal of Nutrition Science, 2023",
-          },
-          {
-            title: "Effects of Meal Timing on Weight Loss",
-            url: "https://pubmed.example.com/67890",
-            author: "American Journal of Clinical Nutrition, 2022",
-          },
-          {
-            title: "Circadian Rhythms and Metabolism",
-            url: "https://pubmed.example.com/11223",
-            author: "Cell Metabolism, 2023",
-          },
-        ],
       }
-
       setResponses([newResponse, ...responses])
       setQuestion("")
-      setIsLoading(false)
-    }, 2000)
+      toast.success("Myth verified successfully!")
+    } catch (error) {
+      toast.error("Failed to verify myth. Please try again.")
+    }
   }
 
   const getVerdictConfig = (verdict: Verdict) => {
     switch (verdict) {
-      case "true":
+      case "TRUE":
         return {
           label: "TRUE",
           icon: CheckCircle2,
           className: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
         }
-      case "false":
+      case "FALSE":
         return {
           label: "FALSE",
           icon: XCircle,
           className: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
         }
-      case "partial":
+      case "PARTIALLY_TRUE":
         return {
           label: "PARTIALLY TRUE",
           icon: CheckCircle2,
           className: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
         }
-      case "pending":
+      case "INCONCLUSIVE":
         return {
-          label: "ANALYZING",
+          label: "INCONCLUSIVE",
           icon: Clock,
           className: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
         }
@@ -106,7 +86,7 @@ export default function MythsPage() {
         <div className="flex flex-col h-[calc(100vh-9rem)] lg:h-[calc(100vh-5rem)]">
           {/* Messages Area */}
           <ScrollArea className="flex-1 p-6">
-            {responses.length === 0 && !isLoading && (
+            {responses.length === 0 && !loading && (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
                   <Sparkles className="h-10 w-10 text-primary" />
@@ -158,7 +138,7 @@ export default function MythsPage() {
             )}
 
             <div className="space-y-6 pb-4">
-              {isLoading && (
+              {loading && (
                 <Card className="border-border/50 animate-pulse">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -237,12 +217,12 @@ export default function MythsPage() {
                   placeholder="Ask any nutrition myth or question..."
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  disabled={isLoading}
+                  disabled={loading}
                   className="flex-1"
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || !question.trim()}
+                  disabled={loading || !question.trim()}
                   className="bg-primary hover:bg-primary/90"
                 >
                   <Send className="h-4 w-4" />
