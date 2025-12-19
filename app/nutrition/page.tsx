@@ -1,0 +1,287 @@
+"use client"
+
+import * as React from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { DashboardSidebar } from "@/components/dashboard-sidebar"
+import { Search, Camera, Flame, Beef, Wheat, Droplet } from "lucide-react"
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+export default function NutritionPage() {
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [showResults, setShowResults] = React.useState(false)
+
+  // Sample data - in real app, this would come from AI analysis
+  const macroData = [
+    { name: "Protein", value: 31, color: "#640000" },
+    { name: "Carbs", value: 0, color: "#B67E7D" },
+    { name: "Fats", value: 3.6, color: "#420001" },
+  ]
+
+  const vitamins = [
+    { name: "Vitamin A", amount: "2%", daily: "16 IU" },
+    { name: "Vitamin C", amount: "0%", daily: "0 mg" },
+    { name: "Vitamin D", amount: "1%", daily: "6 IU" },
+    { name: "Calcium", amount: "1%", daily: "15 mg" },
+    { name: "Iron", amount: "5%", daily: "0.9 mg" },
+    { name: "Potassium", amount: "7%", daily: "256 mg" },
+  ]
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      setShowResults(true)
+    }
+  }
+
+  const handleImageUpload = () => {
+    // Image upload handler
+    setShowResults(true)
+  }
+
+  return (
+    <div className="flex min-h-screen bg-background">
+      <DashboardSidebar />
+
+      <main className="flex-1 overflow-auto lg:ml-0">
+        {/* Header */}
+        <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
+          <div className="px-6 py-6">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Nutrition Analysis</h1>
+            <p className="text-muted-foreground mt-1">Search any food or upload an image for instant analysis</p>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Search Bar */}
+          <Card className="border-border/50">
+            <CardContent className="pt-6">
+              <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search for any food item (e.g., Grilled Chicken Breast)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" className="bg-primary hover:bg-primary/90 flex-1 sm:flex-initial">
+                    <Search className="mr-2 h-4 w-4" />
+                    Analyze
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleImageUpload}
+                    className="flex-1 sm:flex-initial bg-transparent"
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    Scan Image
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Results */}
+          {showResults && (
+            <>
+              {/* Calorie Card */}
+              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
+                <CardHeader className="text-center pb-2">
+                  <CardTitle className="text-5xl font-bold text-primary">165</CardTitle>
+                  <CardDescription className="text-base">Calories per 100g serving</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground">Grilled Chicken Breast</p>
+                    <p className="mt-1">High in protein, low in fat - excellent for muscle building</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Macros and Chart */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Macro Chart */}
+                <Card className="border-border/50">
+                  <CardHeader>
+                    <CardTitle>Macronutrient Breakdown</CardTitle>
+                    <CardDescription>Per 100g serving</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={macroData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value }) => `${name}: ${value}g`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {macroData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Macro Details */}
+                <Card className="border-border/50">
+                  <CardHeader>
+                    <CardTitle>Detailed Macros</CardTitle>
+                    <CardDescription>Nutritional breakdown</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/20">
+                          <Beef className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">Protein</div>
+                          <div className="text-sm text-muted-foreground">Essential amino acids</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">31g</div>
+                        <div className="text-xs text-muted-foreground">62% DV</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border border-secondary/20 bg-secondary/5 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/20">
+                          <Wheat className="h-5 w-5 text-secondary" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">Carbohydrates</div>
+                          <div className="text-sm text-muted-foreground">Energy source</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-secondary">0g</div>
+                        <div className="text-xs text-muted-foreground">0% DV</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border border-accent/20 bg-accent/5 p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/20">
+                          <Droplet className="h-5 w-5 text-accent" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">Fats</div>
+                          <div className="text-sm text-muted-foreground">Healthy fats</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-accent">3.6g</div>
+                        <div className="text-xs text-muted-foreground">5% DV</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Vitamins & Minerals Table */}
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle>Vitamins & Minerals</CardTitle>
+                  <CardDescription>Micronutrient profile per 100g serving</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nutrient</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                          <TableHead className="text-right">% Daily Value</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {vitamins.map((vitamin, i) => (
+                          <TableRow key={i}>
+                            <TableCell className="font-medium">{vitamin.name}</TableCell>
+                            <TableCell className="text-right">{vitamin.daily}</TableCell>
+                            <TableCell className="text-right">
+                              <span
+                                className={
+                                  Number.parseInt(vitamin.amount) > 10
+                                    ? "text-green-600 font-semibold"
+                                    : "text-muted-foreground"
+                                }
+                              >
+                                {vitamin.amount}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* AI Insights */}
+              <Card className="border-border/50 bg-gradient-to-br from-primary/5 to-background">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-primary" />
+                    AI Nutrition Insights
+                  </CardTitle>
+                  <CardDescription>Personalized recommendations based on this food</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="rounded-lg border border-border/50 bg-background p-4">
+                    <h4 className="font-semibold text-foreground mb-2">Health Benefits</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Grilled chicken breast is an excellent source of lean protein with minimal fat. It supports muscle
+                      growth, helps with weight management, and provides essential B vitamins for energy metabolism.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border/50 bg-background p-4">
+                    <h4 className="font-semibold text-foreground mb-2">Serving Suggestion</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Pair with complex carbohydrates like brown rice or sweet potato, and add colorful vegetables for a
+                      well-balanced meal. This combination ensures sustained energy and optimal nutrient absorption.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Empty State */}
+          {!showResults && (
+            <Card className="border-dashed border-2 border-border/50">
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <Search className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="mb-2 text-xl font-semibold text-foreground">Start Your Analysis</h3>
+                <p className="text-muted-foreground max-w-sm leading-relaxed">
+                  Enter a food item above or upload an image to get detailed nutritional information powered by AI
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </main>
+    </div>
+  )
+}
