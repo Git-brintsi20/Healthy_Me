@@ -195,13 +195,6 @@ export default function DashboardPage() {
           </div>
             </>
           )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </main>
     </div>
