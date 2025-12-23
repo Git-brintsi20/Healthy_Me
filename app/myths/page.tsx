@@ -10,6 +10,9 @@ import { Send, Sparkles, CheckCircle2, XCircle, Clock, ExternalLink } from "luci
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMyths } from "@/hooks/use-myths"
 import { useUserData } from "@/hooks/use-user-data"
+import { useAuth } from "@/hooks/use-auth"
+import { db } from "@/lib/firebase/config"
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { toast } from "sonner"
 import { MythData } from "@/types"
 
@@ -22,6 +25,7 @@ interface MythResponse extends MythData {
 export default function MythsPage() {
   const [question, setQuestion] = React.useState("")
   const [responses, setResponses] = React.useState<MythResponse[]>([])
+  const { user } = useAuth()
   const { incrementMythsDebunked } = useUserData()
   const { verifyMyth, loading } = useMyths()
 
@@ -37,6 +41,28 @@ export default function MythsPage() {
       }
       setResponses([newResponse, ...responses])
       await incrementMythsDebunked()
+
+      // Persist myth to Firestore for history / community browsing
+      try {
+        await addDoc(collection(db, "myths"), {
+          question,
+          verdict: result.verdict,
+          explanation: result.explanation,
+          keyPoints: result.keyPoints,
+          sources: result.sources,
+          recommendation: result.recommendation,
+          askedBy: user?.uid ?? null,
+          askedByEmail: user?.email ?? null,
+          askedAt: serverTimestamp(),
+          upvotes: 0,
+          downvotes: 0,
+          views: 0,
+        })
+      } catch (firestoreError) {
+        console.error("Failed to save myth to Firestore:", firestoreError)
+        // Don't block UX if history save fails
+      }
+
       setQuestion("")
       toast.success("Myth verified successfully!")
     } catch (error) {

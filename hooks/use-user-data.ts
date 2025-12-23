@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { db } from "@/lib/firebase/config";
 import {
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy,
-  limit,
-} from "firebase/firestore";
+  db,
+  getUserDocRef,
+  getUserFavoritesCollection,
+  getUserNutritionHistoryCollection,
+} from "@/lib/firebase/firestore";
+import { doc, setDoc, updateDoc, onSnapshot, serverTimestamp, getDoc, query, orderBy, limit, deleteDoc } from "firebase/firestore";
 
 export interface FavoriteFood {
   id: string;
@@ -51,93 +45,156 @@ export function useUserData() {
       return;
     }
 
-    // Subscribe to user document
-    const userDocRef = doc(db, "users", user.uid);
-    const unsubscribe = onSnapshot(
-      userDocRef,
-      async (docSnap) => {
+    const unsubscribers: (() => void)[] = [];
+
+    const loadUserData = async () => {
+      const userDocRef = getUserDocRef(user.uid);
+      const favoritesCol = getUserFavoritesCollection(user.uid);
+      const historyCol = getUserNutritionHistoryCollection(user.uid);
+      
+      try {
+        const docSnap = await getDoc(userDocRef);
+
+        const baseStats = {
+          totalSearches: 0,
+          mythsDebunked: 0,
+          dailyGoal: { calories: 2000, current: 0 },
+        };
+
+        let currentData: UserData = {
+          favorites: [],
+          searchHistory: [],
+          ...baseStats,
+        };
+
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setUserData({
-            favorites: data.favorites || [],
-            searchHistory: data.searchHistory || [],
-            totalSearches: data.totalSearches || 0,
-            mythsDebunked: data.mythsDebunked || 0,
-            dailyGoal: data.dailyGoal || { calories: 2000, current: 0 },
-          });
-        } else {
-          // Create initial user document
-          const initialData: UserData = {
-            favorites: [],
-            searchHistory: [],
-            totalSearches: 0,
-            mythsDebunked: 0,
-            dailyGoal: { calories: 2000, current: 0 },
+          currentData = {
+            ...currentData,
+            totalSearches: data.totalSearches ?? baseStats.totalSearches,
+            mythsDebunked: data.mythsDebunked ?? baseStats.mythsDebunked,
+            dailyGoal: data.dailyGoal ?? baseStats.dailyGoal,
           };
+        } else {
           await setDoc(userDocRef, {
-            ...initialData,
+            ...baseStats,
             email: user.email,
             displayName: user.displayName,
             createdAt: serverTimestamp(),
           });
-          setUserData(initialData);
         }
+
+        setUserData(currentData);
         setLoading(false);
-      },
-      (err) => {
-        console.error("Error fetching user data:", err);
+
+        // Real-time listener for user stats
+        const unsubUser = onSnapshot(
+          userDocRef,
+          (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              setUserData((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      totalSearches: data.totalSearches ?? 0,
+                      mythsDebunked: data.mythsDebunked ?? 0,
+                      dailyGoal: data.dailyGoal ?? baseStats.dailyGoal,
+                    }
+                  : prev
+              );
+            }
+          },
+          (err) => console.error("Error in user stats listener:", err)
+        );
+        unsubscribers.push(unsubUser);
+
+        // Real-time listener for favorites
+        const favQuery = query(favoritesCol, orderBy("addedAt", "desc"), limit(50));
+        const unsubFavorites = onSnapshot(
+          favQuery,
+          (snapshot) => {
+            const favorites = snapshot.docs.map((doc) => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                name: data.name || "",
+                calories: data.calories || 0,
+                addedAt: data.addedAt?.toDate?.() || new Date(),
+              };
+            });
+            setUserData((prev) => (prev ? { ...prev, favorites } : prev));
+          },
+          (err) => console.error("Error in favorites listener:", err)
+        );
+        unsubscribers.push(unsubFavorites);
+
+        // Real-time listener for search history
+        const historyQuery = query(historyCol, orderBy("searchedAt", "desc"), limit(50));
+        const unsubHistory = onSnapshot(
+          historyQuery,
+          (snapshot) => {
+            const searchHistory = snapshot.docs.map((doc) => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                foodName: data.foodName || "",
+                searchedAt: data.searchedAt?.toDate?.() || new Date(),
+              };
+            });
+            setUserData((prev) => (prev ? { ...prev, searchHistory } : prev));
+          },
+          (err) => console.error("Error in history listener:", err)
+        );
+        unsubscribers.push(unsubHistory);
+      } catch (err: any) {
+        console.error("Error loading user data:", err);
         setError(err.message);
         setLoading(false);
       }
-    );
+    };
 
-    return () => unsubscribe();
+    loadUserData();
+
+    return () => {
+      unsubscribers.forEach((unsub) => unsub());
+    };
   }, [user]);
 
   const addToFavorites = async (food: Omit<FavoriteFood, "id" | "addedAt">) => {
     if (!user) return;
 
-    const userDocRef = doc(db, "users", user.uid);
-    const newFavorite: FavoriteFood = {
-      ...food,
-      id: Date.now().toString(),
-      addedAt: new Date(),
-    };
-
-    const currentFavorites = userData?.favorites || [];
-    await updateDoc(userDocRef, {
-      favorites: [...currentFavorites, newFavorite],
+    const favoritesCol = getUserFavoritesCollection(user.uid);
+    await setDoc(doc(favoritesCol), {
+      name: food.name,
+      calories: food.calories,
+      addedAt: serverTimestamp(),
     });
   };
 
   const removeFromFavorites = async (foodId: string) => {
     if (!user) return;
 
-    const userDocRef = doc(db, "users", user.uid);
-    const currentFavorites = userData?.favorites || [];
-    await updateDoc(userDocRef, {
-      favorites: currentFavorites.filter((f) => f.id !== foodId),
-    });
+    const favoritesCol = getUserFavoritesCollection(user.uid);
+    const favoriteDocRef = doc(favoritesCol, foodId);
+    await deleteDoc(favoriteDocRef);
   };
 
   const addSearchHistory = async (foodName: string) => {
     if (!user) return;
 
-    const userDocRef = doc(db, "users", user.uid);
-    const newSearch: SearchHistory = {
-      id: Date.now().toString(),
-      foodName,
-      searchedAt: new Date(),
-    };
+    const userDocRef = getUserDocRef(user.uid);
+    const historyCol = getUserNutritionHistoryCollection(user.uid);
 
-    const currentHistory = userData?.searchHistory || [];
+    await setDoc(doc(historyCol), {
+      foodName,
+      searchedAt: serverTimestamp(),
+      source: "manual_search",
+    });
+
     const totalSearches = (userData?.totalSearches || 0) + 1;
 
-    // Keep only last 50 searches
-    const updatedHistory = [newSearch, ...currentHistory].slice(0, 50);
-
     await updateDoc(userDocRef, {
-      searchHistory: updatedHistory,
       totalSearches,
     });
   };

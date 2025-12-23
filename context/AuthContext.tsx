@@ -1,17 +1,15 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, onAuthStateChanged } from "firebase/auth";
 import {
-  User,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  updateProfile,
-} from "firebase/auth";
+  createSessionCookie,
+  loginWithEmail as firebaseLoginWithEmail,
+  loginWithGooglePopup,
+  logoutUser,
+  registerWithEmail,
+  sendPasswordReset,
+} from "@/lib/firebase/auth";
 import { auth } from "@/lib/firebase/config";
 
 interface AuthContextType {
@@ -47,19 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let sessionCreated = false;
+    
     // Subscribe to auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      
-      // Create session cookie when user logs in
-      if (user) {
+
+      if (user && !sessionCreated) {
+        sessionCreated = true;
         try {
-          const idToken = await user.getIdToken();
-          await fetch("/api/auth/session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idToken }),
-          });
+          await createSessionCookie(user);
         } catch (error) {
           console.error("Error creating session:", error);
         }
@@ -73,21 +68,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-    
     try {
-      const result = await signInWithPopup(auth, provider);
-      // Wait a moment for session creation
-      if (result.user) {
-        const idToken = await result.user.getIdToken();
-        await fetch("/api/auth/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken }),
-        });
+      const user = await loginWithGooglePopup();
+      if (user) {
+        await createSessionCookie(user);
       }
     } catch (error: any) {
       // Don't throw error if user just closed the popup
@@ -102,15 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithEmail = async (email: string, password: string) => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      // Wait for session creation
-      if (result.user) {
-        const idToken = await result.user.getIdToken();
-        await fetch("/api/auth/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken }),
-        });
+      const user = await firebaseLoginWithEmail(email, password);
+      if (user) {
+        await createSessionCookie(user);
       }
     } catch (error) {
       console.error("Error signing in with email:", error);
@@ -120,12 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const registerWithEmail = async (email: string, password: string, displayName?: string) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update profile with display name if provided
-      if (displayName && userCredential.user) {
-        await updateProfile(userCredential.user, { displayName });
-      }
+      await registerWithEmail(email, password, displayName);
     } catch (error) {
       console.error("Error registering with email:", error);
       throw error;
@@ -134,10 +107,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      // Delete session cookie
       await fetch("/api/auth/session", { method: "DELETE" });
-      // Sign out from Firebase
-      await signOut(auth);
+      await logoutUser();
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
@@ -146,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordReset(email);
     } catch (error) {
       console.error("Error sending password reset email:", error);
       throw error;

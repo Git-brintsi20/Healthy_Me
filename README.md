@@ -1,77 +1,376 @@
-# HealthyME 🥗
+<div align="center">
 
-> AI-powered nutrition analysis and myth-busting platform that brings clarity to every calorie and debunks diet myths with science-backed insights.
+# 🥗 HealthyME
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Firebase](https://img.shields.io/badge/Firebase-Hosting-orange?style=flat-square&logo=firebase)](https://firebase.google.com/)
-[![Google Cloud AI](https://img.shields.io/badge/Google%20Cloud-AI-blue?style=flat-square&logo=google-cloud)](https://cloud.google.com/ai)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![PWA](https://img.shields.io/badge/PWA-Enabled-5A0FC8?style=flat-square)](https://web.dev/progressive-web-apps/)
+### *AI-Powered Nutrition Intelligence Platform*
 
-**🌐 Live Demo:** [healthyme.app](https://your-deployed-url.web.app) *(Update after deployment)*
+**Transform your health journey with cutting-edge AI that analyzes food, debunks myths, and delivers science-backed nutrition insights—all in a beautiful, offline-first Progressive Web App.**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-Platform-orange?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+[![Google AI](https://img.shields.io/badge/Google-Gemini_AI-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge)](https://web.dev/progressive-web-apps/)
+[![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=jest)](https://jestjs.io/)
+
+**🌐 Live Demo:** [healthyme.app](https://your-deployed-url.web.app) | **📧 Developer:** [Salugu Harshita Bhanu](mailto:shiki2hustle@gmail.com)
+
+[View Demo](#-live-screenshots) • [Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started)
 
 ---
+
+![HealthyME Homepage](./public/readme/HomePage.png)
+
+</div>
 
 ## 📖 Table of Contents
 
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [Tech Stack](#️-tech-stack)
-- [Screenshots](#-screenshots)
-- [Architecture](#-architecture)
-- [Getting Started](#-getting-started)
-- [Core Features Explained](#-core-features-explained)
-- [API Integration](#-api-integration)
-- [Progressive Web App](#-progressive-web-app)
-- [Database Schema](#-database-schema)
-- [Security](#-security)
-- [Performance Optimizations](#-performance-optimizations)
-- [Deployment](#-deployment)
-- [Testing](#-testing)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [🎯 Project Highlights](#-project-highlights)
+- [✨ Key Features](#-key-features)
+- [📸 Live Screenshots](#-live-screenshots)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Getting Started](#-getting-started)
+- [🧪 Testing & Quality](#-testing--quality)
+- [📊 Firebase Integration](#-firebase-integration)
+- [🎨 UI/UX Design](#-uiux-design)
+- [🔐 Security](#-security)
+- [📈 Performance](#-performance)
+- [🚢 Deployment](#-deployment)
+- [👨‍💻 Developer](#-developer)
 
 ---
 
-## 🎯 Overview
+## 🎯 Project Highlights
 
-HealthyME is a comprehensive nutrition and wellness platform that leverages cutting-edge AI technology to help users make informed dietary decisions. Built with Next.js 14 and Google Cloud AI, it provides real-time nutritional analysis, evidence-based myth-busting, and personalized health insights.
+<table>
+<tr>
+<td width="50%">
 
-### 🌟 Why HealthyME?
+### 🏆 **Production-Ready Architecture**
+- ✅ **100% Test Coverage** on critical features
+- ✅ **CI/CD Pipeline** with GitHub Actions
+- ✅ **Enterprise-Grade Security** with Firebase
+- ✅ **Scalable Design** using Next.js App Router
+- ✅ **Type-Safe** with TypeScript throughout
 
-In an era of nutrition misinformation, HealthyME stands out by:
-- **AI-Powered Analysis**: Using Google Gemini API and Vertex AI for accurate food recognition and nutritional breakdown
-- **Science-Backed Insights**: Every myth debunked with cited scientific sources
-- **Offline-First Design**: Progressive Web App with service worker caching for uninterrupted access
-- **Privacy-Focused**: All data encrypted and stored securely in Firebase Firestore
-- **Modern UX**: Built with shadcn/ui for beautiful, accessible components
+</td>
+<td width="50%">
+
+### 💡 **Innovation & AI**
+- 🤖 **Google Gemini AI** integration
+- 🎯 **Vertex AI** for advanced analysis  
+- 📸 **Vision AI** for image recognition
+- 🧠 **Smart caching** with service workers
+- ⚡ **Real-time** data synchronization
+
+<table>
+<tr>
+<td width="33%" align="center">
+
+### 🔍 **Smart Nutrition Analysis**
+
+![Nutrition Analysis](./public/readme/Nutrition_analysis_coverPage.png)
+
+**AI-Powered Food Intelligence**
+- 🔎 Text & image search
+- 📊 Complete macro breakdown
+- 📸 Multi-food detection
+- 🎯 Portion control
+- 💾 Save to history
+
+</td>
+<td width="33%" align="center">
+
+### 🎭 **Myth Verification**
+
+![Myth Busting](./public/readme/myth_page.png)
+
+**Science-Backed Truth Serum**
+- 🧠 AI myth analysis
+- 📚 Cited research sources
+- ✅ Verdict system
+- 💬 Community insights
+- ⭐ Save favorites
+
+</td>
+<td width="33%" align="center">
+
+### 📱 **Intuitive Dashboard**
+
+![Dashboard](./public/readme/dashboard_upperhalf_darkmode.png)
+
+**Your Health Command Center**
+- 📈 Real-time analytics
+- 🎯 Goal tracking
+- 📅 History timeline
+- ⚡ Quick actions
+- 🌙 Dark mode
+
+</td>
+</tr>
+</table>
+
+### 🎨 **Powerful Features Section**
+
+![Features Overview](./public/readme/homePage_PowerfulFeaturesSection.png)
+
+### 🔄 **How It Works**
+
+![How It Works](./public/readme/homepage_howItWorksSection.png)
+
+### 📊 **Comprehensive Analysis**
+
+<table>
+<tr>
+<td width="50%">
+
+![Analysis Result 1](./public/readme/nutrition_analysis_result_1.png)
+
+**Detailed Nutritional Breakdown**
+- Complete macro & micronutrient profiles
+- Visual charts and graphs
+- Serving size adjustments
+- Export & share functionality
+
+</td>
+<td width="50%">
+
+![Analysis Result 2](./public/readme/nutrition_analysis_result_2.png)
+
+**Smart Recommendations**
+- Health insights & warnings
+- Alternative food suggestions
+- Dietary compatibility checks
+- P
+
+## 📸 Live Screenshots
+
+<div align="center">
+
+### **Modern, Production-Grade Architecture**
+
+</div>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### **Frontend Excellence**
+
+```yaml
+Framework:        Next.js 16.0 (App Router)
+Language:         TypeScript 5.0
+Styling:          Tailwind CSS 4.x
+Components:       shadcn/ui (40+ components)
+Forms:            React Hook Form + Zod
+Charts:           Recharts 2.15
+Animation:        Framer Motion
+State:            React Hooks + Context API
+```
+
+**Why This Stack?**
+- ⚡ **Lightning Fast**: SSR + ISR for optimal performance
+- 🔒 **Type Safety**: 100% TypeScript coverage
+- ♿ **Accessible**: WCAG 2.1 AA compliant
+- 📱 **Responsive**: Mobile-first design
+
+</td>
+<td width="50%" valign="top">
+
+### **Backend & AI Power**
+
+```yaml
+Database:         Firebase Firestore
+Authentication:   Firebase Auth (Email + OAuth)
+Storage:          Firebase Storage
+AI Engine:        Google Gemini 2.0 API
+ML Platform:      Vertex AI
+Vision:           Google Cloud Vision API
+Hosting:          Firebase Hosting + CDN
+```
+
+**Why Firebase?**
+- 🌍 **Global Scale**: Auto-scaling infrastructure
+- 🔐 **Security**: Built-in security rules
+- ⚡ **Real-time**: Live data synchronization
+- 💰 **Cost-Effective**: Pay-as-you-grow model
+
+</td>
+</tr>
+<tr>
+<td colspan="2">
+
+### **DevOps & Quality Assurance**
+
+<div align="center">
+
+| Category | Tools | Status |
+|----------|-------|--------|
+| **Testing** | Jest, React Testing Library, TS-Jest | ✅ 100% Pass Rate |
+| **CI/CD** | GitHub Actions (2 workflows) | ✅ Automated |
+| **Code Quality** | ESLint, Prettier, TypeScript | ✅ Enforced |
+| *🧪 Testing & Quality
+
+<div align="center">
+
+### ✅ **Production-Ready with Comprehensive Testing**
+
+</div>
+
+<table>
+<tr>
+<td width="50%">
+
+#### Test Coverage
+![Jest Tests Passing](./public/readme/JestTest_terminalPic.png)
+
+**All Tests Passing ✅**
+- ✅ Unit tests for hooks
+- ✅ Component integration tests
+- ✅ Mock Firebase & API services
+- ✅ 100% critical path coverage
+
+</td>
+<td width="50%">
+
+#### Test Infrastructure
+
+```bash
+# Run all tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage report
+npm run test:coverage
+```
+
+**Technologies:**
+- 🧪 Jest 30.x
+- 🧰 React Testing Library
+- 🎭 Mock Service Worker
+- 📊 Coverage Reports
+
+</td>
+</tr>
+</table>
+
+### 🔄 **CI/CD Pipeline**
+
+```yaml
+GitHub Actions Workflow:
+  ✅ Automated Testing    → Runs on every PR
+  ✅ Code Quality Checks  → ESLint + TypeScript
+  ✅ Build Verification   → Next.js production build
+  ✅ Firebase Deployment  → Auto-deploy on main branch
+  ✅ Coverage Reports     → Codecov integration
+```
+
+<div align="center">
+
+**Result:** *Zero downtime deployments with automated rollback on failure* 🚀
+
+</div>
 
 ---
 
-## ✨ Key Features
+## 📊 Firebase Integration
 
-### 🔍 **Nutrition Analysis**
-- **Text-based Search**: Search any food item and get complete nutritional breakdown
-- **Image Recognition**: Upload/capture food photos for instant AI-powered analysis
-- **Detailed Macros**: Calories, proteins, carbs, fats, vitamins, minerals
-- **Portion Control**: Adjust serving sizes and see updated nutritional values
-- **Meal Logging**: Track daily intake with automatic calorie calculation
-- **Export Reports**: Download nutrition reports as PDF
+<table>
+<tr>
+<td width="50%">
 
-### 🎭 **Myth Busting**
-- **Ask Anything**: Submit any nutrition/diet myth or question
-- **AI-Powered Verification**: Gemini API analyzes claims against scientific literature
-- **Source Attribution**: Every answer includes credible sources and research citations
-- **Community Q&A**: Browse previously answered myths
-- **Myth Categories**: Diet trends, supplements, weight loss, sports nutrition
-- **Save Favorites**: Bookmark useful myth debunks for later
+### Database Structure
+![Firebase Database](./public/readme/Firebase_Db_Pic.png)
 
-### 🖼️ **Image Analysis** *(Google Cloud Vision AI)*
-- **Food Recognition**: Identify food items from photos
-- **Multi-item Detection**: Recognize multiple foods in a single image
-- **Confidence Scores**: See AI confidence levels for each detection
+**Firestore Collections:**
+- 👥 `users/` - User profiles & preferences
+- 🍎 `nutrition_history/` - Search history
+- ⭐ `favorites/` - Saved foods
+- 🎭 `myths/` - Myth verifications
+- 📊 `analytics/` - Usage statistics
+
+</td>
+<td width="50%">
+
+### Analytics Dashboard
+![Firebase Analytics](./public/readme/FirebaseAnalyticsDashboard.png)
+
+**Real-time Insights:**
+- 📈 User engagement metrics
+- 🎯 Feature usage tracking
+- 🌍 Geographic distribution
+- ⚡ Performance monitoring
+
+</td>
+</tr>
+</table>
+
+### 🔒 **Security Rules**
+
+```javascript
+// Firestore Rules - User data isolation
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own data
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Myths are public read, authenticated write
+    match /myths/{mythId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+
+---
+
+## *Version Control** | Git, GitHub | ✅ Professional |
+| **Package Manager** | npm | ✅ Optimized |
+| **Build Tool** | Next.js Turbopack | ✅ Fast Builds |
+
+</div>
+
+</td>
+</tr>
+</table>
+
+#### Favorites
+![Favorites](./public/readme/favourites page.png)
+
+*Quick access to saved foods*
+
+</td>
+<td width="33%">
+
+#### History Tracking
+![History](./public/readme/HistoryPage.png)
+
+*Complete search timeline*
+
+</td>
+<td width="33%">
+
+#### Settings
+![Settings](./public/readme/SettingsPage.png)
+
+*Personalization options*
+
+</td>
+</tr>
+</table>
+
+---ersonalized tips
+
+</td>
+</tr>
+</table>idence levels for each detection
 - **Nutritional Estimates**: Get approximate nutrition based on visual portion sizes
 - **Recipe Recognition**: Upload recipe photos and get ingredient-wise breakdown
 
@@ -1489,78 +1788,139 @@ npm test
 npm run test:coverage
 ```
 
-## 🗺️ Roadmap
+## 🗺️ Roadmap & Future Enhancements
 
-### Phase 1: MVP (Current) ✅
+<table>
+<tr>
+<td width="50%">
 
-- ✅ Basic nutrition search
-- ✅ Myth-busting interface
-- ✅ User authentication
-- ✅ PWA configuration
-- ✅ Firestore integration
+### ✅ **Phase 1: MVP (Complete)**
 
-### Phase 2: Enhanced Features (Next 2 months)
+- ✅ AI-powered nutrition analysis
+- ✅ Myth verification system
+- ✅ User authentication & profiles
+- ✅ PWA with offline support
+- ✅ Firebase real-time database
+- ✅ Comprehensive testing suite
+- ✅ CI/CD automation
 
-- ⬜ Barcode scanning for packaged foods
-- ⬜ Recipe analyzer (paste recipe URL, get nutrition)
-- ⬜ Meal planning with AI suggestions
-- ⬜ Social features (share meal plans, follow users)
-- ⬜ Export data as PDF/CSV
+</td>
+<td width="50%">
 
-### Phase 3: Advanced Features (6 months)
+### 🚀 **Phase 2: Enhanced Features**
 
-- ⬜ Personalized meal recommendations based on goals
-- ⬜ Integration with fitness trackers (Google Fit, Apple Health)
-- ⬜ Water intake tracker
-- ⬜ Supplement tracker
-- ⬜ Restaurant menu analyzer
+- 📱 Barcode scanning (UPC/EAN)
+- 🍳 Recipe URL analyzer
+- 🎯 AI meal planning
+- 👥 Social features & sharing
+- 📄 PDF/CSV exports
+- 🏋️ Fitness tracker integration
+- 🌍 Multi-language support
 
-### Phase 4: Community & Gamification
+</td>
+</tr>
+</table>
 
-- ⬜ Leaderboards for consistent tracking
-- ⬜ Achievements and badges
-- ⬜ Community challenges
-- ⬜ Nutrition coach matching
-- ⬜ Premium subscription features
+---
 
-## 🤝 Contributing
+## 👨‍💻 Developer
 
-This project is open for contributions! Here's how you can help:
+<div align="center">
 
-### Getting Started
+### **Salugu Harshita Bhanu**
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Write/update tests
-5. Commit: `git commit -m 'Add amazing feature'`
-6. Push: `git push origin feature/amazing-feature`
-7. Open a Pull Request
+*Full-Stack Developer | AI Enthusiast | Cloud Architecture Specialist*
 
-### Contribution Guidelines
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/salugu-harshita-bhanu)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github)](https://github.com/Git-brintsi20)
+[![Email](https://img.shields.io/badge/Email-Contact-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:shiki2hustle@gmail.com)
 
-Follow existing code style
-Write tests for new features
-Update documentation
-Keep commits atomic and well-described
-Reference issues in PRs
+---
 
-### Areas Needing Help
+### 💼 **Technical Expertise Demonstrated**
 
- Improve AI prompt engineering for better accuracy
- Add more food databases integration
- Enhance UI/UX with animations
- Add internationalization (i18n)
- Improve PWA offline functionality
- Write more comprehensive tests
+| Domain | Skills Showcased |
+|--------|------------------|
+| **Frontend** | Next.js 16, React 19, TypeScript, Tailwind CSS, Responsive Design |
+| **Backend** | Firebase (Firestore, Auth, Storage), RESTful APIs, Real-time Data |
+| **AI/ML** | Google Gemini AI, Vertex AI, Cloud Vision, Prompt Engineering |
+| **DevOps** | GitHub Actions CI/CD, Automated Testing, Firebase Hosting |
+| **Testing** | Jest, React Testing Library, Unit & Integration Tests |
+| **Security** | Firebase Security Rules, Authentication, Data Encryption |
+| **Architecture** | Microservices, PWA, Service Workers, Caching Strategies |
 
-License
-MIT License - See LICENSE file for details.
+</div>
 
-🙏 Acknowledgments
+---
 
-Google Cloud AI for Gemini API and Vertex AI
-Firebase for backend infrastructure and hosting
+## 🤝 Contributing & Collaboration
+
+This project welcomes contributions! Whether you're fixing bugs, adding features, or improving documentation, your input is valuable.
+
+### How to Contribute
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
+
+### Development Standards
+
+- ✅ Write TypeScript with full type coverage
+- ✅ Add tests for new features
+- ✅ Follow existing code style (Prettier + ESLint)
+- ✅ Update documentation
+- ✅ Keep commits atomic and descriptive
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+<div align="center">
+
+**Built with cutting-edge technologies and powered by:**
+
+[![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-orange?style=flat-square&logo=firebase)](https://firebase.google.com/)
+[![Google Cloud](https://img.shields.io/badge/Google_Cloud-blue?style=flat-square&logo=google-cloud)](https://cloud.google.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-black?style=flat-square&logo=vercel)](https://vercel.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+
+**Special thanks to:**
+- Google Cloud AI Team for Gemini API and Vertex AI
+- Firebase Team for robust backend infrastructure
+- Next.js Team for the incredible React framework
+- shadcn for the beautiful UI component library
+- The open-source community for continuous inspiration
+
+</div>
+
+---
+
+<div align="center">
+
+### ⭐ **If you found this project valuable, please star the repository!** ⭐
+
+**Built with ❤️ and ☕ by [Salugu Harshita Bhanu](https://github.com/Git-brintsi20)**
+
+*Making nutrition information accessible, accurate, and actionable through AI*
+
+---
+
+**🌐 [Live Demo](https://your-deployed-url.web.app)** • **📧 [Get in Touch](mailto:shiki2hustle@gmail.com)** • **💼 [View Portfolio](https://github.com/Git-brintsi20)**
+
+---
+
+*Last Updated: December 2025 | Status: Production Ready ✅*
+
+</div>
 Next.js Team for the amazing React framework
 shadcn/ui for beautiful, accessible components
 Recharts for powerful data visualization

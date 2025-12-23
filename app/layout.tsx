@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/context/AuthContext"
+import { ThemeProvider } from "@/context/ThemeContext"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
@@ -58,30 +59,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="HealthyME" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className={`font-sans antialiased`}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-          <Analytics />
-        </AuthProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('Service Worker registered successfully:', registration.scope);
-                    },
-                    function(err) {
-                      console.log('Service Worker registration failed:', err);
-                    }
-                  );
-                });
-              }
-            `,
-          }}
-        />
+      <body className={`font-sans antialiased min-h-screen`}>
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+            <Toaster />
+            <Analytics />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

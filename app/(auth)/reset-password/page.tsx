@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
-import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"
+import { Loader2, ArrowLeft, CheckCircle2, Sparkles } from "lucide-react"
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = React.useState("")
@@ -58,6 +58,9 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
+            <Link href="/" className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary hover:bg-primary/90 transition-colors">
+              <Sparkles className="h-6 w-6 text-primary-foreground" />
+            </Link>
             <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
               <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
@@ -108,6 +111,9 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
+          <Link href="/" className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary hover:bg-primary/90 transition-colors">
+            <Sparkles className="h-6 w-6 text-primary-foreground" />
+          </Link>
           <CardTitle className="text-2xl font-bold text-center">
             Reset password
           </CardTitle>

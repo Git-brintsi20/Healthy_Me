@@ -136,5 +136,51 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.6;
   }
+  
+  /* Increase base font sizes globally */
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
+  }
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight;
+  }
+  h3 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-semibold leading-snug;
+  }
+  h4 {
+    @apply text-xl md:text-2xl lg:text-3xl font-semibold;
+  }
+  h5 {
+    @apply text-lg md:text-xl lg:text-2xl font-medium;
+  }
+  p {
+    @apply text-base md:text-lg leading-relaxed;
+  }
+  
+  /* Reduce excessive padding/margins */
+  .container {
+    @apply px-4 md:px-6 lg:px-8;
+  }
+  
+  /* Better card spacing */
+  [class*="card"] {
+    @apply p-4 md:p-6;
+  }
+  
+  /* Tighter section spacing */
+  section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+  
+  /* Button improvements */
+  button, [role="button"] {
+    @apply text-base md:text-lg;
+  }
+  
+  /* Input improvements */
+  input, textarea, select {
+    @apply text-base md:text-lg;  }
 }

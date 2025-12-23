@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
+import { getVisionClient } from "@/lib/ai/vision";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,74 +13,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = getGeminiModel("gemini-1.5-flash");
+    const base64 = image.split(",")[1] || image;
 
-    // Use Gemini's vision capabilities to detect food items
-    const prompt = `
-      Analyze this food image and identify all food items visible.
-      Return ONLY a valid JSON object with this structure (no markdown):
-      {
-        "detectedFoods": ["food1", "food2", "food3"],
-        "confidence": "high" or "medium" or "low",
-        "description": "Brief description of what you see in the image"
-      }
-    `;
+    const model = getGeminiModel("gemini-2.0-flash-exp");
 
-    // Convert base64 to the format Gemini expects
-    const imagePart = {
-      inlineData: {
-        data: image.split(",")[1] || image, // Remove data:image/png;base64, if present
-        mimeType: "image/jpeg",
-      },
-    };
-
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
-
-    // Clean response
-    const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
+    // Step 1: Try to detect food items with Google Cloud Vision API
+    let detectedFoods: string[] | null = null;
 
     try {
-      const imageData = JSON.parse(cleanedText);
+      const visionClient = getVisionClient();
+      const [result] = await visionClient.labelDetection({
+        image: { content: base64 },
+      });
 
-      // Get nutrition for each detected food
-      if (imageData.detectedFoods && imageData.detectedFoods.length > 0) {
-        const nutritionPromises = imageData.detectedFoods.slice(0, 3).map(async (foodName: string) => {
-          const nutritionPrompt = `
-            Provide nutritional information for: ${foodName} (estimated portion from image)
-            Return ONLY valid JSON with: {"name": "...", "calories": number, "protein": number, "carbs": number, "fats": number}
-          `;
-
-          const nutritionResult = await model.generateContent(nutritionPrompt);
-          const nutritionText = await nutritionResult.response.text();
-          const cleanedNutrition = nutritionText.replace(/```json\n?|\n?```/g, "").trim();
-
-          try {
-            return JSON.parse(cleanedNutrition);
-          } catch {
-            return {
-              name: foodName,
-              calories: 0,
-              protein: 0,
-              carbs: 0,
-              fats: 0,
-            };
-          }
-        });
-
-        const nutritionData = await Promise.all(nutritionPromises);
-        imageData.nutrition = nutritionData;
-      }
-
-      return NextResponse.json(imageData);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", cleanedText);
-      return NextResponse.json(
-        { error: "Failed to parse image analysis data" },
-        { status: 500 }
-      );
+      const labels = result.labelAnnotations || [];
+      detectedFoods = labels
+        .filter((label) => (label.score ?? 0) > 0.7)
+        .map((label) => label.description || "")
+        .filter(Boolean)
+        .slice(0, 5);
+    } catch (visionError) {
+      console.warn("Vision API failed or is not configured, falling back to Gemini vision:", visionError);
     }
+
+    // Step 2: If Vision didn't give us anything, fall back to Gemini's built-in vision
+    if (!detectedFoods || detectedFoods.length === 0) {
+      const prompt = `
+        Analyze this food image and identify all food items visible.
+        Return ONLY a valid JSON object with this structure (no markdown):
+        {
+          "detectedFoods": ["food1", "food2", "food3"],
+          "confidence": "high" or "medium" or "low",
+          "description": "Brief description of what you see in the image"
+        }
+      `;
+
+      const imagePart = {
+        inlineData: {
+          data: base64,
+          mimeType: "image/jpeg",
+        },
+      };
+
+      const result = await model.generateContent([prompt, imagePart]);
+      const response = await result.response;
+      const text = response.text();
+
+      const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
+
+      try {
+        const imageData = JSON.parse(cleanedText);
+        detectedFoods = Array.isArray(imageData.detectedFoods) ? imageData.detectedFoods : [];
+
+        // We keep the rest of the structure from Gemini
+        const enriched = await enrichWithNutrition(model, detectedFoods, imageData);
+        return NextResponse.json(enriched);
+      } catch (parseError) {
+        console.error("Failed to parse Gemini vision response:", cleanedText);
+        return NextResponse.json(
+          { error: "Failed to parse image analysis data" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Step 3: Build a Vision-style response object and enrich with Gemini nutrition
+    const visionResponse = {
+      detectedFoods,
+      confidence: detectedFoods.length > 0 ? "high" : "low",
+      description: "Detected food items using Google Cloud Vision API",
+    };
+
+    const enriched = await enrichWithNutrition(model, detectedFoods, visionResponse);
+
+    return NextResponse.json(enriched);
   } catch (error) {
     console.error("Image analysis error:", error);
     return NextResponse.json(
@@ -87,4 +94,44 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+async function enrichWithNutrition(
+  model: ReturnType<typeof getGeminiModel>,
+  foods: string[],
+  base: any
+) {
+  if (!foods || foods.length === 0) {
+    return base;
+  }
+
+  const nutritionPromises = foods.slice(0, 3).map(async (foodName: string) => {
+    const nutritionPrompt = `
+      Provide nutritional information for: ${foodName} (estimated portion from image)
+      Return ONLY valid JSON with: {"name": "...", "calories": number, "protein": number, "carbs": number, "fats": number}
+    `;
+
+    const nutritionResult = await model.generateContent(nutritionPrompt);
+    const nutritionText = await nutritionResult.response.text();
+    const cleanedNutrition = nutritionText.replace(/```json\n?|\n?```/g, "").trim();
+
+    try {
+      return JSON.parse(cleanedNutrition);
+    } catch {
+      return {
+        name: foodName,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+      };
+    }
+  });
+
+  const nutritionData = await Promise.all(nutritionPromises);
+  return {
+    ...base,
+    detectedFoods: foods,
+    nutrition: nutritionData,
+  };
 }

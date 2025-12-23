@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AuthProvider } from '@/context/AuthContext'
 import LoginPage from './page'

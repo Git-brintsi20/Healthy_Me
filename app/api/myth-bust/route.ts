@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
+import { adminDb } from "@/lib/firebase/admin";
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +50,24 @@ export async function POST(request: NextRequest) {
 
     try {
       const mythData = JSON.parse(cleanedText);
+
+      // Persist myth to Firestore "myths" collection for community browsing
+      try {
+        const db = adminDb();
+        const mythsCollection = db.collection("myths");
+        await mythsCollection.add({
+          ...mythData,
+          question: myth,
+          askedBy: "anonymous",
+          askedAt: new Date(),
+          upvotes: 0,
+          downvotes: 0,
+          views: 0,
+        });
+      } catch (persistError) {
+        console.warn("Failed to persist myth to Firestore:", persistError);
+      }
+
       return NextResponse.json(mythData);
     } catch (parseError) {
       console.error("Failed to parse AI response:", cleanedText);

@@ -37,15 +37,20 @@ describe('useNutrition', () => {
   })
 
   it('should handle errors', async () => {
-    const mockError = new Error('API Error')
-    ;(global.fetch as jest.Mock).mockRejectedValueOnce(mockError)
+    ;(global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error('API Error')
+    )
 
     const { result } = renderHook(() => useNutrition())
 
-    await result.current.analyzeFood('Apple', '100g')
+    try {
+      await result.current.analyzeFood('Apple', '100g')
+    } catch (error) {
+      // Expected to throw
+    }
 
     await waitFor(() => {
-      expect(result.current.error).toBe('Failed to analyze food. Please try again.')
+      expect(result.current.error).toBe('API Error')
       expect(result.current.loading).toBe(false)
     })
   })

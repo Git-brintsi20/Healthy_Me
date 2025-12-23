@@ -16,6 +16,8 @@ import {
   LogOut,
   User,
   Heart,
+  Moon,
+  Sun,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useTheme } from "@/context/ThemeContext"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -40,25 +43,40 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const { theme, setTheme, resolvedTheme } = useTheme()
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+  }
 
   return (
     <>
       {/* Mobile menu button */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-3 lg:hidden">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
             <Sparkles className="h-4 w-4 text-sidebar-primary-foreground" />
           </div>
           <span className="text-lg font-bold text-sidebar-foreground">HealthyME</span>
         </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-sidebar-foreground hover:bg-sidebar-accent"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            {resolvedTheme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Overlay for mobile */}
@@ -73,18 +91,28 @@ export function DashboardSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-screen w-64 transform border-r border-sidebar-border bg-sidebar transition-transform duration-200 ease-in-out",
-          "lg:translate-x-0 lg:static",
+          "fixed top-0 left-0 z-40 h-full min-h-screen w-64 transform border-r border-sidebar-border bg-sidebar transition-transform duration-200 ease-in-out",
+          "lg:translate-x-0 lg:sticky",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full min-h-screen flex-col sticky top-0">
           {/* Logo */}
-          <div className="hidden lg:flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
-              <Sparkles className="h-5 w-5 text-sidebar-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-sidebar-foreground">HealthyME</span>
+          <div className="hidden lg:flex h-16 items-center justify-between border-b border-sidebar-border px-6">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
+                <Sparkles className="h-5 w-5 text-sidebar-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold text-sidebar-foreground">HealthyME</span>
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-sidebar-foreground hover:bg-sidebar-accent"
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
           </div>
 
           {/* Navigation */}
