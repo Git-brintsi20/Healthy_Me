@@ -156,14 +156,136 @@
 • Alternative food suggestions<br/>
 • Dietary compatibility checks<br/>
 • Personalized insights
+</td>
+</tr>
+</table>
+
+---
 
 ## 📸 Live Screenshots
 
-<div align="center">
+### 🏠 **Dashboard Views**
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<h4 align="center">Dashboard - Upper Section</h4>
+<p align="center">
+  <img src="public/readme/dashboard_upperhalf_darkmode.png" width="100%" alt="Dashboard Upper" />
+</p>
+<p align="center"><i>Real-time analytics and quick actions</i></p>
+</td>
+<td width="50%" valign="top">
+<h4 align="center">Dashboard - Analytics</h4>
+<p align="center">
+  <img src="public/readme/dashboard_lowerhalf_darkmode.png" width="100%" alt="Dashboard Lower" />
+</p>
+<p align="center"><i>Detailed nutritional insights</i></p>
+</td>
+</tr>
+</table>
+
+### 🍎 **Nutrition Analysis**
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<h4 align="center">Analysis Results - Part 1</h4>
+<p align="center">
+  <img src="public/readme/nutrition_analysis_result_1.png" width="100%" alt="Nutrition Result 1" />
+</p>
+<p align="center"><i>Complete macro & micronutrient breakdown</i></p>
+</td>
+<td width="50%" valign="top">
+<h4 align="center">Analysis Results - Part 2</h4>
+<p align="center">
+  <img src="public/readme/nutrition_analysis_result_2.png" width="100%" alt="Nutrition Result 2" />
+</p>
+<p align="center"><i>Smart recommendations & insights</i></p>
+</td>
+</tr>
+</table>
+
+### 🎭 **Myth Verification Pages**
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<h4 align="center">Myth Dashboard</h4>
+<p align="center">
+  <img src="public/readme/Myth_dashboard_Page.png" width="100%" alt="Myth Dashboard" />
+</p>
+<p align="center"><i>Browse popular nutrition myths</i></p>
+</td>
+<td width="50%" valign="top">
+<h4 align="center">Verification Results</h4>
+<p align="center">
+  <img src="public/readme/mythverificationPage.png" width="100%" alt="Myth Verification" />
+</p>
+<p align="center"><i>AI-powered myth analysis with sources</i></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h4 align="center">Myth Browse View 1</h4>
+<p align="center">
+  <img src="public/readme/myth_page.png" width="100%" alt="Myths Page 1" />
+</p>
+<p align="center"><i>Explore verified myths</i></p>
+</td>
+<td width="50%" valign="top">
+<h4 align="center">Myth Browse View 2</h4>
+<p align="center">
+  <img src="public/readme/myth_page2.png" width="100%" alt="Myths Page 2" />
+</p>
+<p align="center"><i>Detailed myth analysis</i></p>
+</td>
+</tr>
+</table>
+
+---
+
+## ✨ Key Features
+
+### 🔍 **Smart Image Recognition**
+- **Multi-Food Detection**: Recognize multiple foods in a single image
+- **Confidence Scoring**: AI provides confidence levels for each detection
+- **Nutritional Estimates**: Get approximate nutrition based on visual portion sizes
+- **Recipe Recognition**: Upload recipe photos and get ingredient-wise breakdown
+
+### 📱 **User Experience Features**
+
+<table>
+<tr>
+<td width="33%" valign="top">
+<h4 align="center">Favorites</h4>
+<p align="center">
+  <img src="public/readme/favourites page.png" width="100%" alt="Favorites" />
+</p>
+<p align="center"><i>Quick access to saved foods</i></p>
+</td>
+<td width="33%" valign="top">
+<h4 align="center">History Tracking</h4>
+<p align="center">
+  <img src="public/readme/HistoryPage.png" width="100%" alt="History" />
+</p>
+<p align="center"><i>Complete search timeline</i></p>
+</td>
+<td width="33%" valign="top">
+<h4 align="center">Settings</h4>
+<p align="center">
+  <img src="public/readme/SettingsPage.png" width="100%" alt="Settings" />
+</p>
+<p align="center"><i>Personalization options</i></p>
+</td>
+</tr>
+</table>
+
+---
+
+## 🛠️ Tech Stack
 
 ### **Modern, Production-Grade Architecture**
-
-</div>
 
 <table>
 <tr>
@@ -211,32 +333,20 @@ Hosting:          Firebase Hosting + CDN
 
 </td>
 </tr>
-<tr>
-<td colspan="2">
+</table>
 
-### **DevOps & Quality Assurance**
+---
 
-<div align="center">
-
-| Category | Tools | Status |
-|----------|-------|--------|
-| **Testing** | Jest, React Testing Library, TS-Jest | ✅ 100% Pass Rate |
-| **CI/CD** | GitHub Actions (2 workflows) | ✅ Automated |
-| **Code Quality** | ESLint, Prettier, TypeScript | ✅ Enforced |
-| *🧪 Testing & Quality
-
-<div align="center">
-
-### ✅ **Production-Ready with Comprehensive Testing**
-
-</div>
+## 🧪 Testing & Quality
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
-#### Test Coverage
-<img src="public/readme/JestTest_terminalPic.png" width="100%" alt="Jest Tests Passing" />
+### **Test Coverage**
+<p align="center">
+  <img src="public/readme/JestTest_terminalPic.png" width="100%" alt="Jest Tests Passing" />
+</p>
 
 **All Tests Passing ✅**
 - ✅ Unit tests for hooks
@@ -245,9 +355,9 @@ Hosting:          Firebase Hosting + CDN
 - ✅ 100% critical path coverage
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
-#### Test Infrastructure
+### **Test Infrastructure**
 
 ```bash
 # Run all tests
@@ -293,10 +403,12 @@ GitHub Actions Workflow:
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
-### Database Structure
-<img src="public/readme/Firebase_Db_Pic.png" width="100%" alt="Firebase Database" />
+### **Database Structure**
+<p align="center">
+  <img src="public/readme/Firebase_Db_Pic.png" width="100%" alt="Firebase Database" />
+</p>
 
 **Firestore Collections:**
 - 👥 `users/` - User profiles & preferences
@@ -306,10 +418,12 @@ GitHub Actions Workflow:
 - 📊 `analytics/` - Usage statistics
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
-### Analytics Dashboard
-<img src="public/readme/FirebaseAnalyticsDashboard.png" width="100%" alt="Firebase Analytics" />
+### **Analytics Dashboard**
+<p align="center">
+  <img src="public/readme/FirebaseAnalyticsDashboard.png" width="100%" alt="Firebase Analytics" />
+</p>
 
 **Real-time Insights:**
 - 📈 User engagement metrics
@@ -344,37 +458,7 @@ service cloud.firestore {
 
 ---
 
-### 📱 **User Experience Features**
-
-<table>
-<tr>
-<td width="33%" valign="top">
-<h4 align="center">Favorites</h4>
-<p align="center">
-  <img src="public/readme/favourites page.png" width="100%" alt="Favorites" />
-</p>
-<p align="center"><i>Quick access to saved foods</i></p>
-</td>
-<td width="33%" valign="top">
-<h4 align="center">History Tracking</h4>
-<p align="center">
-  <img src="public/readme/HistoryPage.png" width="100%" alt="History" />
-</p>
-<p align="center"><i>Complete search timeline</i></p>
-</td>
-<td width="33%" valign="top">
-<h4 align="center">Settings</h4>
-<p align="center">
-  <img src="public/readme/SettingsPage.png" width="100%" alt="Settings" />
-</p>
-<p align="center"><i>Personalization options</i></p>
-</td>
-</tr>
-</table>
-
----idence levels for each detection
-- **Nutritional Estimates**: Get approximate nutrition based on visual portion sizes
-- **Recipe Recognition**: Upload recipe photos and get ingredient-wise breakdown
+## ✨ Additional Features
 
 ### 📊 **Data Visualization**
 - **Interactive Charts**: Recharts-powered visualizations for macro breakdown
