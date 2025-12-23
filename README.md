@@ -19,7 +19,7 @@
 
 ---
 
-![HealthyME Homepage](./public/readme/HomePage.png)
+<img src="./public/readme/HomePage.png" alt="HealthyME Homepage" width="100%" />
 
 </div>
 
@@ -70,7 +70,7 @@
 
 ### 🔍 **Smart Nutrition Analysis**
 
-![Nutrition Analysis](./public/readme/Nutrition_analysis_coverPage.png)
+<img src="./public/readme/Nutrition_analysis_coverPage.png" alt="Nutrition Analysis" width="350" />
 
 **AI-Powered Food Intelligence**
 - 🔎 Text & image search
@@ -84,7 +84,7 @@
 
 ### 🎭 **Myth Verification**
 
-![Myth Busting](./public/readme/myth_page.png)
+<img src="./public/readme/myth_page.png" alt="Myth Busting" width="350" />
 
 **Science-Backed Truth Serum**
 - 🧠 AI myth analysis
@@ -98,7 +98,7 @@
 
 ### 📱 **Intuitive Dashboard**
 
-![Dashboard](./public/readme/dashboard_upperhalf_darkmode.png)
+<img src="./public/readme/dashboard_upperhalf_darkmode.png" alt="Dashboard" width="350" />
 
 **Your Health Command Center**
 - 📈 Real-time analytics
@@ -113,11 +113,11 @@
 
 ### 🎨 **Powerful Features Section**
 
-![Features Overview](./public/readme/homePage_PowerfulFeaturesSection.png)
+<img src="./public/readme/homePage_PowerfulFeaturesSection.png" alt="Features Overview" width="100%" />
 
 ### 🔄 **How It Works**
 
-![How It Works](./public/readme/homepage_howItWorksSection.png)
+<img src="./public/readme/homepage_howItWorksSection.png" alt="How It Works" width="100%" />
 
 ### 📊 **Comprehensive Analysis**
 
@@ -125,7 +125,7 @@
 <tr>
 <td width="50%">
 
-![Analysis Result 1](./public/readme/nutrition_analysis_result_1.png)
+<img src="./public/readme/nutrition_analysis_result_1.png" alt="Analysis Result 1" width="100%" />
 
 **Detailed Nutritional Breakdown**
 - Complete macro & micronutrient profiles
@@ -136,7 +136,7 @@
 </td>
 <td width="50%">
 
-![Analysis Result 2](./public/readme/nutrition_analysis_result_2.png)
+<img src="./public/readme/nutrition_analysis_result_2.png" alt="Analysis Result 2" width="100%" />
 
 **Smart Recommendations**
 - Health insights & warnings
@@ -223,7 +223,7 @@ Hosting:          Firebase Hosting + CDN
 <td width="50%">
 
 #### Test Coverage
-![Jest Tests Passing](./public/readme/JestTest_terminalPic.png)
+<img src="./public/readme/JestTest_terminalPic.png" alt="Jest Tests Passing" width="100%" />
 
 **All Tests Passing ✅**
 - ✅ Unit tests for hooks
@@ -283,7 +283,7 @@ GitHub Actions Workflow:
 <td width="50%">
 
 ### Database Structure
-![Firebase Database](./public/readme/Firebase_Db_Pic.png)
+<img src="./public/readme/Firebase_Db_Pic.png" alt="Firebase Database" width="100%" />
 
 **Firestore Collections:**
 - 👥 `users/` - User profiles & preferences
@@ -296,7 +296,7 @@ GitHub Actions Workflow:
 <td width="50%">
 
 ### Analytics Dashboard
-![Firebase Analytics](./public/readme/FirebaseAnalyticsDashboard.png)
+<img src="./public/readme/FirebaseAnalyticsDashboard.png" alt="Firebase Analytics" width="100%" />
 
 **Real-time Insights:**
 - 📈 User engagement metrics
@@ -342,7 +342,7 @@ service cloud.firestore {
 </table>
 
 #### Favorites
-![Favorites](./public/readme/favourites page.png)
+<img src="./public/readme/favourites page.png" alt="Favorites" width="100%" />
 
 *Quick access to saved foods*
 
@@ -350,7 +350,7 @@ service cloud.firestore {
 <td width="33%">
 
 #### History Tracking
-![History](./public/readme/HistoryPage.png)
+<img src="./public/readme/HistoryPage.png" alt="History" width="100%" />
 
 *Complete search timeline*
 
@@ -358,7 +358,7 @@ service cloud.firestore {
 <td width="33%">
 
 #### Settings
-![Settings](./public/readme/SettingsPage.png)
+<img src="./public/readme/SettingsPage.png" alt="Settings" width="100%" />
 
 *Personalization options*
 
