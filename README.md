@@ -491,40 +491,6 @@ service cloud.firestore {
 
 ---
 
-## 🛠️ Tech Stack
-
-### **Frontend**
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| **Next.js** | React framework with App Router | 14.x |
-| **TypeScript** | Type-safe development | 5.x |
-| **Tailwind CSS** | Utility-first CSS framework | 3.x |
-| **shadcn/ui** | Accessible component library | Latest |
-| **Recharts** | Data visualization library | 2.x |
-| **React Hook Form** | Form state management | 7.x |
-| **Zod** | Schema validation | 3.x |
-
-### **Backend & AI**
-| Technology | Purpose |
-|------------|---------|
-| **Firebase Firestore** | NoSQL database for user data, history, favorites |
-| **Firebase Auth** | User authentication and session management |
-| **Firebase Storage** | Image uploads and storage |
-| **Google Gemini API** | AI text generation for myth-busting and analysis |
-| **Vertex AI** | Advanced AI processing for complex queries |
-| **Google Cloud Vision** | Image recognition and food detection |
-
-### **DevOps & Tooling**
-| Tool | Purpose |
-|------|---------|
-| **Firebase Hosting** | Serverless static hosting with CDN |
-| **GitHub Actions** | CI/CD pipeline for automated deployment |
-| **Vercel** | Alternative hosting option for Next.js |
-| **ESLint + Prettier** | Code quality and formatting |
-| **Jest + RTL** | Unit and integration testing |
-
----
-
 ## 🏗️ Architecture
 
 ### System Architecture Diagram
