@@ -19,7 +19,9 @@
 
 ---
 
-<img src="./public/readme/HomePage.png" alt="HealthyME Homepage" width="100%" />
+<p align="center">
+  <img src="public/readme/HomePage.png" width="100%" alt="HealthyME Homepage" />
+</p>
 
 </div>
 
@@ -45,7 +47,7 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🏆 **Production-Ready Architecture**
 - ✅ **100% Test Coverage** on critical features
@@ -55,7 +57,7 @@
 - ✅ **Type-Safe** with TypeScript throughout
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 💡 **Innovation & AI**
 - 🤖 **Google Gemini AI** integration
@@ -64,85 +66,96 @@
 - 🧠 **Smart caching** with service workers
 - ⚡ **Real-time** data synchronization
 
+</td>
+</tr>
+</table>
+
+---
+
+## ✨ Key Features
+
+### 📸 Feature Showcase
+
 <table>
 <tr>
-<td width="33%" align="center">
-
-### 🔍 **Smart Nutrition Analysis**
-
-<img src="./public/readme/Nutrition_analysis_coverPage.png" alt="Nutrition Analysis" width="350" />
-
-**AI-Powered Food Intelligence**
-- 🔎 Text & image search
-- 📊 Complete macro breakdown
-- 📸 Multi-food detection
-- 🎯 Portion control
-- 💾 Save to history
-
+<td width="33%" valign="top">
+<h3 align="center">🔍 Smart Nutrition Analysis</h3>
+<p align="center">
+  <img src="public/readme/Nutrition_analysis_coverPage.png" width="100%" alt="Nutrition Analysis" />
+</p>
+<p align="center">
+  <b>AI-Powered Food Intelligence</b><br/>
+  🔎 Text & image search<br/>
+  📊 Complete macro breakdown<br/>
+  📸 Multi-food detection<br/>
+  🎯 Portion control<br/>
+  💾 Save to history
+</p>
 </td>
-<td width="33%" align="center">
-
-### 🎭 **Myth Verification**
-
-<img src="./public/readme/myth_page.png" alt="Myth Busting" width="350" />
-
-**Science-Backed Truth Serum**
-- 🧠 AI myth analysis
-- 📚 Cited research sources
-- ✅ Verdict system
-- 💬 Community insights
-- ⭐ Save favorites
-
+<td width="33%" valign="top">
+<h3 align="center">🎭 Myth Verification</h3>
+<p align="center">
+  <img src="public/readme/myth_page.png" width="100%" alt="Myth Busting" />
+</p>
+<p align="center">
+  <b>Science-Backed Truth Serum</b><br/>
+  🧠 AI myth analysis<br/>
+  📚 Cited research sources<br/>
+  ✅ Verdict system<br/>
+  💬 Community insights<br/>
+  ⭐ Save favorites
+</p>
 </td>
-<td width="33%" align="center">
-
-### 📱 **Intuitive Dashboard**
-
-<img src="./public/readme/dashboard_upperhalf_darkmode.png" alt="Dashboard" width="350" />
-
-**Your Health Command Center**
-- 📈 Real-time analytics
-- 🎯 Goal tracking
-- 📅 History timeline
-- ⚡ Quick actions
-- 🌙 Dark mode
-
+<td width="33%" valign="top">
+<h3 align="center">📱 Intuitive Dashboard</h3>
+<p align="center">
+  <img src="public/readme/dashboard_upperhalf_darkmode.png" width="100%" alt="Dashboard" />
+</p>
+<p align="center">
+  <b>Your Health Command Center</b><br/>
+  📈 Real-time analytics<br/>
+  🎯 Goal tracking<br/>
+  📅 History timeline<br/>
+  ⚡ Quick actions<br/>
+  🌙 Dark mode
+</p>
 </td>
 </tr>
 </table>
 
 ### 🎨 **Powerful Features Section**
 
-<img src="./public/readme/homePage_PowerfulFeaturesSection.png" alt="Features Overview" width="100%" />
+<p align="center">
+  <img src="public/readme/homePage_PowerfulFeaturesSection.png" width="100%" alt="Features Overview" />
+</p>
 
 ### 🔄 **How It Works**
 
-<img src="./public/readme/homepage_howItWorksSection.png" alt="How It Works" width="100%" />
+<p align="center">
+  <img src="public/readme/homepage_howItWorksSection.png" width="100%" alt="How It Works" />
+</p>
 
 ### 📊 **Comprehensive Analysis**
 
 <table>
 <tr>
-<td width="50%">
-
-<img src="./public/readme/nutrition_analysis_result_1.png" alt="Analysis Result 1" width="100%" />
-
-**Detailed Nutritional Breakdown**
-- Complete macro & micronutrient profiles
-- Visual charts and graphs
-- Serving size adjustments
-- Export & share functionality
-
+<td width="50%" valign="top">
+<img src="public/readme/nutrition_analysis_result_1.png" width="100%" alt="Analysis Result 1" />
+<br/><br/>
+<b>Detailed Nutritional Breakdown</b><br/>
+• Complete macro & micronutrient profiles<br/>
+• Visual charts and graphs<br/>
+• Serving size adjustments<br/>
+• Export & share functionality
 </td>
-<td width="50%">
-
-<img src="./public/readme/nutrition_analysis_result_2.png" alt="Analysis Result 2" width="100%" />
-
-**Smart Recommendations**
-- Health insights & warnings
-- Alternative food suggestions
-- Dietary compatibility checks
-- P
+<td width="50%" valign="top">
+<img src="public/readme/nutrition_analysis_result_2.png" width="100%" alt="Analysis Result 2" />
+<br/><br/>
+<b>Smart Recommendations</b><br/>
+• Health insights & warnings<br/>
+• Alternative food suggestions<br/>
+• Dietary compatibility checks<br/>
+• Personalized insights
 
 ## 📸 Live Screenshots
 
@@ -223,7 +236,7 @@ Hosting:          Firebase Hosting + CDN
 <td width="50%">
 
 #### Test Coverage
-<img src="./public/readme/JestTest_terminalPic.png" alt="Jest Tests Passing" width="100%" />
+<img src="public/readme/JestTest_terminalPic.png" width="100%" alt="Jest Tests Passing" />
 
 **All Tests Passing ✅**
 - ✅ Unit tests for hooks
@@ -283,7 +296,7 @@ GitHub Actions Workflow:
 <td width="50%">
 
 ### Database Structure
-<img src="./public/readme/Firebase_Db_Pic.png" alt="Firebase Database" width="100%" />
+<img src="public/readme/Firebase_Db_Pic.png" width="100%" alt="Firebase Database" />
 
 **Firestore Collections:**
 - 👥 `users/` - User profiles & preferences
@@ -296,7 +309,7 @@ GitHub Actions Workflow:
 <td width="50%">
 
 ### Analytics Dashboard
-<img src="./public/readme/FirebaseAnalyticsDashboard.png" alt="Firebase Analytics" width="100%" />
+<img src="public/readme/FirebaseAnalyticsDashboard.png" width="100%" alt="Firebase Analytics" />
 
 **Real-time Insights:**
 - 📈 User engagement metrics
@@ -331,46 +344,35 @@ service cloud.firestore {
 
 ---
 
-## *Version Control** | Git, GitHub | ✅ Professional |
-| **Package Manager** | npm | ✅ Optimized |
-| **Build Tool** | Next.js Turbopack | ✅ Fast Builds |
+### 📱 **User Experience Features**
 
-</div>
-
+<table>
+<tr>
+<td width="33%" valign="top">
+<h4 align="center">Favorites</h4>
+<p align="center">
+  <img src="public/readme/favourites page.png" width="100%" alt="Favorites" />
+</p>
+<p align="center"><i>Quick access to saved foods</i></p>
+</td>
+<td width="33%" valign="top">
+<h4 align="center">History Tracking</h4>
+<p align="center">
+  <img src="public/readme/HistoryPage.png" width="100%" alt="History" />
+</p>
+<p align="center"><i>Complete search timeline</i></p>
+</td>
+<td width="33%" valign="top">
+<h4 align="center">Settings</h4>
+<p align="center">
+  <img src="public/readme/SettingsPage.png" width="100%" alt="Settings" />
+</p>
+<p align="center"><i>Personalization options</i></p>
 </td>
 </tr>
 </table>
 
-#### Favorites
-<img src="./public/readme/favourites page.png" alt="Favorites" width="100%" />
-
-*Quick access to saved foods*
-
-</td>
-<td width="33%">
-
-#### History Tracking
-<img src="./public/readme/HistoryPage.png" alt="History" width="100%" />
-
-*Complete search timeline*
-
-</td>
-<td width="33%">
-
-#### Settings
-<img src="./public/readme/SettingsPage.png" alt="Settings" width="100%" />
-
-*Personalization options*
-
-</td>
-</tr>
-</table>
-
----ersonalized tips
-
-</td>
-</tr>
-</table>idence levels for each detection
+---idence levels for each detection
 - **Nutritional Estimates**: Get approximate nutrition based on visual portion sizes
 - **Recipe Recognition**: Upload recipe photos and get ingredient-wise breakdown
 
@@ -436,38 +438,6 @@ service cloud.firestore {
 | **Vercel** | Alternative hosting option for Next.js |
 | **ESLint + Prettier** | Code quality and formatting |
 | **Jest + RTL** | Unit and integration testing |
-
----
-
-## 📸 Screenshots
-
-### Landing Page
-![Landing Page](./docs/screenshots/landing.png)
-*Hero section with clear value proposition and CTA*
-
-### Nutrition Search
-![Nutrition Search](./docs/screenshots/nutrition-search.png)
-*Real-time search with autocomplete and instant results*
-
-### Food Analysis Results
-![Analysis Results](./docs/screenshots/analysis-results.png)
-*Detailed nutritional breakdown with macros visualization*
-
-### Image Upload & Recognition
-![Image Upload](./docs/screenshots/image-upload.png)
-*Drag-and-drop interface with AI-powered food detection*
-
-### Myth Busting Interface
-![Myth Busting](./docs/screenshots/myth-busting.png)
-*Ask questions and get science-backed answers with sources*
-
-### User Dashboard
-![Dashboard](./docs/screenshots/dashboard.png)
-*Personalized dashboard with recent searches and favorites*
-
-### Mobile PWA
-![Mobile View](./docs/screenshots/mobile-pwa.png)
-*Responsive design with native app-like experience*
 
 ---
 
