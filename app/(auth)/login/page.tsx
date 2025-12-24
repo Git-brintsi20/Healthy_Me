@@ -37,10 +37,9 @@ export default function LoginPage() {
     try {
       await loginWithEmail(email, password)
       toast.success("Successfully logged in!")
-      // Wait a bit for session cookie to be set before redirect
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 100)
+      // Force immediate redirect and refresh
+      router.push("/dashboard")
+      router.refresh()
     } catch (error: any) {
       console.error("Login error:", error)
       toast.error(error.message || "Failed to login. Please check your credentials.")
@@ -54,10 +53,9 @@ export default function LoginPage() {
     try {
       await loginWithGoogle()
       toast.success("Successfully logged in with Google!")
-      // Wait a bit for session cookie to be set before redirect
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 100)
+      // Force immediate redirect and refresh
+      router.push("/dashboard")
+      router.refresh()
     } catch (error: any) {
       // Don't show error if user just closed the popup
       if (error?.code !== 'auth/popup-closed-by-user') {

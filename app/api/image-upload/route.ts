@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
       const labels = result.labelAnnotations || [];
       detectedFoods = labels
-        .filter((label) => (label.score ?? 0) > 0.7)
-        .map((label) => label.description || "")
+        .filter((label: any) => (label.score ?? 0) > 0.7)
+        .map((label: any) => label.description || "")
         .filter(Boolean)
         .slice(0, 5);
     } catch (visionError) {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
         detectedFoods = Array.isArray(imageData.detectedFoods) ? imageData.detectedFoods : [];
 
         // We keep the rest of the structure from Gemini
-        const enriched = await enrichWithNutrition(model, detectedFoods, imageData);
+        const enriched = await enrichWithNutrition(model, detectedFoods || [], imageData);
         return NextResponse.json(enriched);
       } catch (parseError) {
         console.error("Failed to parse Gemini vision response:", cleanedText);
@@ -80,11 +80,11 @@ export async function POST(request: NextRequest) {
     // Step 3: Build a Vision-style response object and enrich with Gemini nutrition
     const visionResponse = {
       detectedFoods,
-      confidence: detectedFoods.length > 0 ? "high" : "low",
+      confidence: detectedFoods && detectedFoods.length > 0 ? "high" : "low",
       description: "Detected food items using Google Cloud Vision API",
     };
 
-    const enriched = await enrichWithNutrition(model, detectedFoods, visionResponse);
+    const enriched = await enrichWithNutrition(model, detectedFoods || [], visionResponse);
 
     return NextResponse.json(enriched);
   } catch (error) {

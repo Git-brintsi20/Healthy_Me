@@ -1,6 +1,6 @@
-import vision from "@google-cloud/vision";
+import { ImageAnnotatorClient } from "@google-cloud/vision";
 
-let visionClient: vision.ImageAnnotatorClient | null = null;
+let visionClient: ImageAnnotatorClient | null = null;
 
 /**
  * Returns a singleton Google Cloud Vision ImageAnnotatorClient.
@@ -13,8 +13,8 @@ export function getVisionClient() {
     const keyFile = process.env.GOOGLE_CLOUD_KEY_PATH;
 
     visionClient = keyFile
-      ? new vision.ImageAnnotatorClient({ keyFilename: keyFile })
-      : new vision.ImageAnnotatorClient();
+      ? new ImageAnnotatorClient({ keyFilename: keyFile })
+      : new ImageAnnotatorClient();
   }
 
   return visionClient;

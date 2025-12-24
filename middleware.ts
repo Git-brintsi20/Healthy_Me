@@ -1,29 +1,10 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+// DISABLED: Firebase Auth runs on client-side, middleware runs server-side
+// This causes redirect loops. Client-side protection is handled in page layouts.
 export function middleware(request: NextRequest) {
-  // Get the pathname
-  const path = request.nextUrl.pathname
-
-  // Define public paths that don't require authentication
-  const publicPaths = ["/", "/login", "/register", "/reset-password"]
-  const isPublicPath = publicPaths.includes(path)
-
-  // Check if user is authenticated (you can check cookies or headers)
-  // For Firebase Auth, we'll check for a session cookie
-  const token = request.cookies.get("authToken")?.value || ""
-
-  // Redirect logic
-  if (!isPublicPath && !token) {
-    // Redirect to login if trying to access protected route without auth
-    return NextResponse.redirect(new URL("/login", request.url))
-  }
-
-  if (isPublicPath && token && path !== "/") {
-    // Redirect to dashboard if trying to access auth pages while logged in
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  }
-
+  // Just pass through - auth protection happens client-side
   return NextResponse.next()
 }
 

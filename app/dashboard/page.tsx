@@ -8,10 +8,35 @@ import { Apple, ShieldQuestion, HistoryIcon, TrendingUp, Zap, Target, Loader2, S
 import Link from "next/link"
 import { useAuth } from "@/hooks/use-auth"
 import { useUserData } from "@/hooks/use-user-data"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { userData, loading } = useUserData()
+  const router = useRouter()
+
+  // Client-side auth protection
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login")
+    }
+  }, [user, authLoading, router])
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  // Don't render if not authenticated
+  if (!user) {
+    return null
+  }
+
 
   const totalSearches = userData?.totalSearches || 0
   const mythsDebunked = userData?.mythsDebunked || 0

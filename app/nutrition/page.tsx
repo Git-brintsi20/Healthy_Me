@@ -13,6 +13,7 @@ import { useImageUpload } from "@/hooks/use-image-upload"
 import { useUserData } from "@/hooks/use-user-data"
 import { toast } from "sonner"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { ProtectedPage } from "@/components/protected-page"
 
 export default function NutritionPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -104,14 +105,15 @@ export default function NutritionPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <DashboardSidebar />
+    <ProtectedPage>
+      <div className="flex min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        <DashboardSidebar />
 
-      <main className="flex-1 overflow-auto lg:ml-0">
-        {/* Enhanced Header with Gradient */}
-        <div className="relative border-b border-border/40 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 backdrop-blur pt-16 lg:pt-0 overflow-hidden">
-          <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]" />
-          <div className="relative px-6 py-8">
+        <main className="flex-1 overflow-auto lg:ml-0">
+          {/* Enhanced Header with Gradient */}
+          <div className="relative border-b border-border/40 bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 backdrop-blur pt-16 lg:pt-0 overflow-hidden">
+            <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,transparent,black)]" />
+            <div className="relative px-6 py-8">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg">
                 <Flame className="h-6 w-6 text-primary-foreground" />
@@ -598,5 +600,6 @@ export default function NutritionPage() {
         </div>
       </main>
     </div>
+    </ProtectedPage>
   )
 }

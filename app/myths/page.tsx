@@ -15,6 +15,7 @@ import { db } from "@/lib/firebase/config"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { toast } from "sonner"
 import { MythData } from "@/types"
+import { ProtectedPage } from "@/components/protected-page"
 
 type Verdict = "TRUE" | "FALSE" | "PARTIALLY_TRUE" | "INCONCLUSIVE"
 
@@ -100,13 +101,14 @@ export default function MythsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <DashboardSidebar />
+    <ProtectedPage>
+      <div className="flex min-h-screen bg-background">
+        <DashboardSidebar />
 
-      <main className="flex-1 overflow-auto lg:ml-0">
-        {/* Header */}
-        <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
-          <div className="px-6 py-6">
+        <main className="flex-1 overflow-auto lg:ml-0">
+          {/* Header */}
+          <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
+            <div className="px-6 py-6">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Myth Busting</h1>
             <p className="text-muted-foreground mt-1">Ask any nutrition question and get science-backed answers</p>
           </div>
@@ -222,8 +224,8 @@ export default function MythsPage() {
                                 <div className="font-medium text-sm text-foreground leading-relaxed">
                                   {source.title}
                                 </div>
-                                {source.author && (
-                                  <div className="text-xs text-muted-foreground mt-1">{source.author}</div>
+                                {source.authors && (
+                                  <div className="text-xs text-muted-foreground mt-1">{source.authors}</div>
                                 )}
                               </div>
                             </a>
@@ -266,5 +268,6 @@ export default function MythsPage() {
         </div>
       </main>
     </div>
+    </ProtectedPage>
   )
 }

@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { useUserData } from "@/hooks/use-user-data"
 import { Heart, Trash2, Loader2, Apple, Clock, Flame } from "lucide-react"
 import { toast } from "sonner"
+import { ProtectedPage } from "@/components/protected-page"
 
 export default function FavoritesPage() {
   const { user } = useAuth()
@@ -37,14 +38,15 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <DashboardSidebar />
+    <ProtectedPage>
+      <div className="flex min-h-screen bg-background">
+        <DashboardSidebar />
 
-      <main className="flex-1 overflow-auto lg:ml-0">
-        {/* Header */}
-        <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
-          <div className="px-6 py-6">
-            <div className="flex items-center gap-3">
+        <main className="flex-1 overflow-auto lg:ml-0">
+          {/* Header */}
+          <div className="border-b border-border/40 bg-background/95 backdrop-blur pt-16 lg:pt-0">
+            <div className="px-6 py-6">
+              <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-pink-100 dark:bg-pink-900/20">
                 <Heart className="h-5 w-5 text-pink-600 dark:text-pink-400" />
               </div>
@@ -141,5 +143,6 @@ export default function FavoritesPage() {
         </div>
       </main>
     </div>
+    </ProtectedPage>
   )
 }
