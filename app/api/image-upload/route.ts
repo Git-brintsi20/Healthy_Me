@@ -6,20 +6,29 @@ export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  console.log("=== IMAGE UPLOAD DEBUG START ===");
+  console.log("Has GEMINI_API_KEY:", !!process.env.GEMINI_API_KEY);
+  console.log("Key length:", process.env.GEMINI_API_KEY?.length);
+  console.log("Key preview:", process.env.GEMINI_API_KEY?.substring(0, 20) + "...");
+  
   try {
     const { image } = await request.json(); // base64 image
 
     if (!image) {
+      console.error("No image provided in request");
       return NextResponse.json(
         { error: "Image is required" },
         { status: 400 }
       );
     }
 
+    console.log("Image data received, length:", image.length);
     const base64 = image.split(",")[1] || image;
+    console.log("Base64 extracted, length:", base64.length);
 
-    const model = getGeminiModel("gemini-2.0-flash-exp");
-
+    console.log("Initializing Gemini model...");
+      const model = getGeminiModel("gemini-pro-vision");
+      console.log("Model initialized successfully (using gemini-pro-vision)");
     console.log("Using Gemini Vision API for image analysis (no Firebase Storage needed)");
 
     // Use Gemini's built-in vision directly (primary method - no external storage needed)
@@ -40,11 +49,16 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    console.log("Sending to Gemini vision...");
     const result = await model.generateContent([prompt, imagePart]);
+    console.log("Gemini response received");
+    
     const response = await result.response;
     const text = response.text();
+    console.log("Raw Gemini response:", text.substring(0, 200));
 
     const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
+    console.log("Cleaned response:", cleanedText.substring(0, 200));
 
     try {
       const imageData = JSON.parse(cleanedText);
@@ -69,9 +83,23 @@ export async function POST(request: NextRequest) {
       geminiKeyLength: process.env.GEMINI_API_KEY?.length || 0
     });
     
+    // Check for quota errors
+    const errorMessage = error instanceof Error ? error.message : '';
+    if (errorMessage.includes('quota') || errorMessage.includes('429')) {
+      return NextResponse.json(
+        { 
+          error: "🎓 Student Account Quota Exceeded",
+          message: "Image analysis requires Google AI credits. The free tier quota has been used. Please use the text-based nutrition analysis feature instead - it works perfectly!",
+          suggestion: "Type your food items manually in the nutrition analysis tab"
+        },
+        { status: 429 }
+      );
+    }
+    
     return NextResponse.json(
       { 
-        error: "Failed to analyze image",
+        error: "Image analysis temporarily unavailable",
+        message: "Please use text-based nutrition analysis instead",
         details: error instanceof Error ? error.message : 'Unknown error',
         hint: !process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY not configured' : undefined
       },
