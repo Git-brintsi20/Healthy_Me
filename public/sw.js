@@ -25,6 +25,18 @@ self.addEventListener("install", (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener("fetch", (event) => {
+  // Skip caching for non-GET requests (POST, PUT, DELETE, etc.)
+  if (event.request.method !== "GET") {
+    event.respondWith(fetch(event.request))
+    return
+  }
+
+  // Skip caching for API routes (they should always be fresh)
+  if (event.request.url.includes("/api/")) {
+    event.respondWith(fetch(event.request))
+    return
+  }
+
   event.respondWith(
     caches.match(event.request).then((response) => {
       // Cache hit - return response

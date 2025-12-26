@@ -4,6 +4,12 @@ import type { NextRequest } from "next/server"
 // DISABLED: Firebase Auth runs on client-side, middleware runs server-side
 // This causes redirect loops. Client-side protection is handled in page layouts.
 export function middleware(request: NextRequest) {
+  // Allow manifest.json and service worker without auth
+  const pathname = request.nextUrl.pathname
+  if (pathname === "/manifest.json" || pathname === "/sw.js") {
+    return NextResponse.next()
+  }
+  
   // Just pass through - auth protection happens client-side
   return NextResponse.next()
 }

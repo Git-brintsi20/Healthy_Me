@@ -21,23 +21,35 @@ export async function POST(request: NextRequest) {
 
     const model = getGeminiModel("gemini-2.0-flash-exp");
 
-    // Step 1: Try to detect food items with Google Cloud Vision API
+    // Step 1: Try to detect food items with Google Cloud Vision API (Optional)
     let detectedFoods: string[] | null = null;
 
-    try {
-      const visionClient = getVisionClient();
-      const [result] = await visionClient.labelDetection({
-        image: { content: base64 },
-      });
+    // Only try Vision API if credentials are fully configured
+    const hasVisionCredentials = 
+      process.env.FIREBASE_CLIENT_EMAIL && 
+      process.env.FIREBASE_PRIVATE_KEY && 
+      (process.env.GOOGLE_CLOUD_PROJECT_ID || process.env.VERTEX_AI_PROJECT_ID);
 
-      const labels = result.labelAnnotations || [];
-      detectedFoods = labels
-        .filter((label: any) => (label.score ?? 0) > 0.7)
-        .map((label: any) => label.description || "")
-        .filter(Boolean)
-        .slice(0, 5);
-    } catch (visionError) {
-      console.warn("Vision API failed or is not configured, falling back to Gemini vision:", visionError);
+    if (hasVisionCredentials) {
+      try {
+        const visionClient = getVisionClient();
+        const [result] = await visionClient.labelDetection({
+          image: { content: base64 },
+        });
+
+        const labels = result.labelAnnotations || [];
+        detectedFoods = labels
+          .filter((label: any) => (label.score ?? 0) > 0.7)
+          .map((label: any) => label.description || "")
+          .filter(Boolean)
+          .slice(0, 5);
+        
+        console.log("Vision API detected foods:", detectedFoods);
+      } catch (visionError) {
+        console.warn("Vision API failed, falling back to Gemini vision:", visionError);
+      }
+    } else {
+      console.log("Vision API credentials not configured, using Gemini vision only");
     }
 
     // Step 2: If Vision didn't give us anything, fall back to Gemini's built-in vision

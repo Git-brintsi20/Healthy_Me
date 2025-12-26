@@ -13,7 +13,7 @@
 [![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge)](https://web.dev/progressive-web-apps/)
 [![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=jest)](https://jestjs.io/)
 
-**🌐 Live Demo:** [HealthyME App](https://healthy-l5kwiti6h-harshitas-projects-504f51a0.vercel.app/) | **📧 Developer:** [Salugu Harshita Bhanu](mailto:shiki2hustle@gmail.com)
+**🌐 Live Demo:** [HealthyME App](https://healthy-me-roan.vercel.app/) | **📧 Developer:** [Salugu Harshita Bhanu](mailto:shiki2hustle@gmail.com)
 
 [View Demo](#-live-screenshots) • [Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started)
 
