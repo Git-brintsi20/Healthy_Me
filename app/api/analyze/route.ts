@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
+import { adminDb } from "@/lib/firebase/admin";
 
 export async function POST(request: NextRequest) {
   try {
-    const { foodName, servingSize } = await request.json();
+    const { foodName, servingSize, userId, conversationHistory = [] } = await request.json();
 
     if (!foodName) {
       return NextResponse.json(
@@ -14,7 +15,16 @@ export async function POST(request: NextRequest) {
 
     const model = getGeminiModel();
 
-    const prompt = `
+    // Build conversation context
+    let contextPrompt = "";
+    if (conversationHistory.length > 0) {
+      contextPrompt = "\nPrevious conversation:\n" + 
+        conversationHistory.slice(-5).map((msg: any) => 
+          `${msg.role}: ${msg.content}`
+        ).join("\n") + "\n\n";
+    }
+
+    const prompt = `${contextPrompt}
       Provide detailed nutritional information for: ${foodName}
       Serving size: ${servingSize || "100g"}
       
@@ -52,6 +62,26 @@ export async function POST(request: NextRequest) {
 
     try {
       const nutritionData = JSON.parse(cleanedText);
+      
+      // Save to conversation history
+      if (userId) {
+        try {
+          const db = adminDb();
+          await db.collection(`users/${userId}/conversations`).add({
+            role: 'user',
+            content: `Analyze: ${foodName} (${servingSize || '100g'})`,
+            timestamp: new Date()
+          });
+          await db.collection(`users/${userId}/conversations`).add({
+            role: 'assistant',
+            content: JSON.stringify(nutritionData),
+            timestamp: new Date()
+          });
+        } catch (dbError) {
+          console.error("Failed to save conversation:", dbError);
+        }
+      }
+      
       return NextResponse.json(nutritionData);
     } catch (parseError) {
       console.error("Failed to parse AI response:", cleanedText);
