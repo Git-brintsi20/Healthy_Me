@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
-import { getVisionClient } from "@/lib/ai/vision";
 
 // Extend timeout for image processing
 export const maxDuration = 30;
@@ -21,88 +20,46 @@ export async function POST(request: NextRequest) {
 
     const model = getGeminiModel("gemini-2.0-flash-exp");
 
-    // Step 1: Try to detect food items with Google Cloud Vision API (Optional)
-    let detectedFoods: string[] | null = null;
+    console.log("Using Gemini Vision API for image analysis (no Firebase Storage needed)");
 
-    // Only try Vision API if credentials are fully configured
-    const hasVisionCredentials = 
-      process.env.FIREBASE_CLIENT_EMAIL && 
-      process.env.FIREBASE_PRIVATE_KEY && 
-      (process.env.GOOGLE_CLOUD_PROJECT_ID || process.env.VERTEX_AI_PROJECT_ID);
-
-    if (hasVisionCredentials) {
-      try {
-        const visionClient = getVisionClient();
-        const [result] = await visionClient.labelDetection({
-          image: { content: base64 },
-        });
-
-        const labels = result.labelAnnotations || [];
-        detectedFoods = labels
-          .filter((label: any) => (label.score ?? 0) > 0.7)
-          .map((label: any) => label.description || "")
-          .filter(Boolean)
-          .slice(0, 5);
-        
-        console.log("Vision API detected foods:", detectedFoods);
-      } catch (visionError) {
-        console.warn("Vision API failed, falling back to Gemini vision:", visionError);
+    // Use Gemini's built-in vision directly (primary method - no external storage needed)
+    const prompt = `
+      Analyze this food image and identify all food items visible.
+      Return ONLY a valid JSON object with this structure (no markdown):
+      {
+        "detectedFoods": ["food1", "food2", "food3"],
+        "confidence": "high" or "medium" or "low",
+        "description": "Brief description of what you see in the image"
       }
-    } else {
-      console.log("Vision API credentials not configured, using Gemini vision only");
-    }
+    `;
 
-    // Step 2: If Vision didn't give us anything, fall back to Gemini's built-in vision
-    if (!detectedFoods || detectedFoods.length === 0) {
-      const prompt = `
-        Analyze this food image and identify all food items visible.
-        Return ONLY a valid JSON object with this structure (no markdown):
-        {
-          "detectedFoods": ["food1", "food2", "food3"],
-          "confidence": "high" or "medium" or "low",
-          "description": "Brief description of what you see in the image"
-        }
-      `;
-
-      const imagePart = {
-        inlineData: {
-          data: base64,
-          mimeType: "image/jpeg",
-        },
-      };
-
-      const result = await model.generateContent([prompt, imagePart]);
-      const response = await result.response;
-      const text = response.text();
-
-      const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
-
-      try {
-        const imageData = JSON.parse(cleanedText);
-        detectedFoods = Array.isArray(imageData.detectedFoods) ? imageData.detectedFoods : [];
-
-        // We keep the rest of the structure from Gemini
-        const enriched = await enrichWithNutrition(model, detectedFoods || [], imageData);
-        return NextResponse.json(enriched);
-      } catch (parseError) {
-        console.error("Failed to parse Gemini vision response:", cleanedText);
-        return NextResponse.json(
-          { error: "Failed to parse image analysis data" },
-          { status: 500 }
-        );
-      }
-    }
-
-    // Step 3: Build a Vision-style response object and enrich with Gemini nutrition
-    const visionResponse = {
-      detectedFoods,
-      confidence: detectedFoods && detectedFoods.length > 0 ? "high" : "low",
-      description: "Detected food items using Google Cloud Vision API",
+    const imagePart = {
+      inlineData: {
+        data: base64,
+        mimeType: "image/jpeg",
+      },
     };
 
-    const enriched = await enrichWithNutrition(model, detectedFoods || [], visionResponse);
+    const result = await model.generateContent([prompt, imagePart]);
+    const response = await result.response;
+    const text = response.text();
 
-    return NextResponse.json(enriched);
+    const cleanedText = text.replace(/```json\n?|\n?```/g, "").trim();
+
+    try {
+      const imageData = JSON.parse(cleanedText);
+      const detectedFoods = Array.isArray(imageData.detectedFoods) ? imageData.detectedFoods : [];
+
+      // Enrich with detailed nutrition information
+      const enriched = await enrichWithNutrition(model, detectedFoods, imageData);
+      return NextResponse.json(enriched);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini vision response:", cleanedText);
+      return NextResponse.json(
+        { error: "Failed to parse image analysis data", raw: cleanedText },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error("Image analysis error:", error);
     console.error("Error details:", {
