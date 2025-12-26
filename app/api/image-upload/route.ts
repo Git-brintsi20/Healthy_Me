@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
 import { getVisionClient } from "@/lib/ai/vision";
 
+// Extend timeout for image processing
+export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { image } = await request.json(); // base64 image
@@ -89,8 +93,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(enriched);
   } catch (error) {
     console.error("Image analysis error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      geminiKeyLength: process.env.GEMINI_API_KEY?.length || 0
+    });
+    
     return NextResponse.json(
-      { error: "Failed to analyze image" },
+      { 
+        error: "Failed to analyze image",
+        details: error instanceof Error ? error.message : 'Unknown error',
+        hint: !process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY not configured' : undefined
+      },
       { status: 500 }
     );
   }
