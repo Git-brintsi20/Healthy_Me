@@ -4,6 +4,11 @@ import { useAuth } from "./use-auth";
 import { db } from "@/lib/firebase/config";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
+type FirestoreLikeError = {
+  code?: string;
+  message?: string;
+};
+
 export function useNutrition() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +28,18 @@ export function useNutrition() {
         const history = snapshot.docs.map(doc => doc.data()).reverse();
         setConversationHistory(history);
       } catch (err) {
-        console.error("Failed to load conversation history:", err);
+        const firestoreError = err as FirestoreLikeError;
+        const isExpectedPermissionOrIndexIssue =
+          firestoreError?.code === "permission-denied" ||
+          firestoreError?.code === "failed-precondition" ||
+          firestoreError?.message?.includes("Missing or insufficient permissions") ||
+          firestoreError?.message?.includes("index");
+
+        // In demo/dev environments, continue gracefully when history cannot be queried.
+        if (!isExpectedPermissionOrIndexIssue) {
+          console.error("Failed to load conversation history:", err);
+        }
+        setConversationHistory([]);
       }
     };
     
@@ -47,7 +63,16 @@ export function useNutrition() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to analyze food");
+        let message = "Failed to analyze food";
+        try {
+          const errorPayload = await response.json();
+          if (errorPayload?.error && typeof errorPayload.error === "string") {
+            message = errorPayload.error;
+          }
+        } catch {
+          // Keep generic fallback if error response is not JSON.
+        }
+        throw new Error(message);
       }
 
       const result = await response.json();

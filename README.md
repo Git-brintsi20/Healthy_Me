@@ -15,7 +15,9 @@
 
 **🌐 Live Demo:** [HealthyME App](https://healthy-me-roan.vercel.app/) | **📧 Developer:** [Salugu Harshita Bhanu](mailto:shiki2hustle@gmail.com)
 
-[View Demo](#-live-screenshots) • [Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started)
+[![Watch Demo Video](https://img.shields.io/badge/Watch%20Demo%20Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ypsXv6evGQU?si=4sUkT1k3lFU3Zdqo)
+
+[Features](#-key-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started)
 
 ---
 

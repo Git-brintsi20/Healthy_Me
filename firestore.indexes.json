@@ -1,4 +1,19 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "myths",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "askedBy",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "askedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

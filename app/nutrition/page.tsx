@@ -44,7 +44,7 @@ export default function NutritionPage() {
         toast.success("Food analyzed successfully!")
       } catch (error) {
         console.error("Nutrition analysis error:", error)
-        toast.error("Failed to analyze food. Please try again.")
+        toast.error(error instanceof Error ? error.message : "Failed to analyze food. Please try again.")
       }
     }
   }

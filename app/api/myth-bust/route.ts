@@ -2,9 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { getGeminiModel } from "@/lib/ai/gemini";
 import { adminDb } from "@/lib/firebase/admin";
 
+function fallbackMythResponse(myth: string) {
+  return {
+    verdict: "INCONCLUSIVE",
+    explanation:
+      "Live AI quota is temporarily unavailable, so this is a fallback analysis. In general, nutrition myths depend on context such as dose, overall diet pattern, and individual health conditions.",
+    keyPoints: [
+      "Single foods or nutrients rarely explain health outcomes in isolation",
+      "Total diet quality and consistency matter more than isolated claims",
+      "Use evidence from peer-reviewed sources and licensed professionals",
+    ],
+    sources: [
+      {
+        title: "World Health Organization - Healthy diet",
+        authors: "WHO",
+        publication: "World Health Organization",
+        year: 2024,
+        url: "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+        summary: "Overview of evidence-based healthy eating guidance.",
+      },
+    ],
+    recommendation:
+      "Treat this as a temporary estimate and retry once Gemini quota is restored.",
+    question: myth,
+  };
+}
+
 export async function POST(request: NextRequest) {
+  let myth = "";
+
   try {
-    const { myth } = await request.json();
+    const payload = await request.json();
+    myth = payload.myth;
 
     if (!myth) {
       return NextResponse.json(
@@ -78,8 +107,18 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error("Myth-busting error:", error);
+    const message = error instanceof Error ? error.message : "Failed to verify myth";
+    const isQuotaOrKeyIssue =
+      message.includes("429") ||
+      message.toLowerCase().includes("quota") ||
+      message.includes("GEMINI_API_KEY");
+
+    if (myth && isQuotaOrKeyIssue) {
+      return NextResponse.json(fallbackMythResponse(myth));
+    }
+
     return NextResponse.json(
-      { error: "Failed to verify myth" },
+      { error: message },
       { status: 500 }
     );
   }
